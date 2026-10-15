@@ -1,0 +1,15 @@
+# 论文版权材料不入库：用 fetch_all.py 自己拉。
+# 本地可以把 papers 做成目录链接（junction/symlink）指向完整论文库；
+# 链接可能被 git 当成"文件"而非目录，所以两种写法都要有。
+papers/
+papers
+
+# 索引由 build.py 生成
+kb/index/
+kb/__pycache__/
+__pycache__/
+*.pyc
+
+# 系统杂项
+.DS_Store
+Thumbs.db
