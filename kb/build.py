@@ -34,7 +34,7 @@ ROUTE = {
     "worldmodels": "WM-latent", "dreamer": "WM-latent", "dreamerv3": "WM-latent",
     "planet": "WM-latent",
     "vjepa2": "WM-JEPA", "unipi": "WM-视频", "cosmos": "WM-平台",
-    "genie": "WM-交互", "walloss": "VLA", "lingbot": "VLA",
+    "genie": "WM-交互", "walloss": "VLA", "lingbot": "VLA", "openvla": "VLA",
     "dreamgen": "WM-数据工厂", "dreamzero": "WAM", "vpp2": "WAM",
     "fdm": "范式修正", "gemini4-argon": "LLM路线",
 }
