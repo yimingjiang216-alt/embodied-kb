@@ -36,7 +36,7 @@ ROUTE = {
     "vjepa2": "WM-JEPA", "unipi": "WM-视频", "cosmos": "WM-平台",
     "genie": "WM-交互", "walloss": "VLA", "lingbot": "VLA", "openvla": "VLA",
     "dreamgen": "WM-数据工厂", "dreamzero": "WAM", "vpp2": "WAM",
-    "fdm": "范式修正", "gemini4-argon": "LLM路线",
+    "fdm": "范式修正", "gemini4-argon": "LLM路线", "isaaclab": "仿真",
 }
 
 # ---------------- 简易 BM25（不依赖第三方库） ----------------
