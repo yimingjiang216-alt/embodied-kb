@@ -38,6 +38,7 @@ ROUTE = {
     "dreamgen": "WM-数据工厂", "dreamzero": "WAM", "vpp2": "WAM",
     "fdm": "范式修正", "gemini4-argon": "LLM路线", "isaaclab": "仿真",
     "vlnce": "VLN", "vln-survey": "VLN", "navid": "VLN",
+    "01-认知架构": "框架",
 }
 
 # ---------------- 简易 BM25（不依赖第三方库） ----------------
