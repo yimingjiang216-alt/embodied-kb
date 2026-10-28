@@ -83,7 +83,8 @@ def evaluate(queries, label, k=5, semantic=False):
             b_hits = [(i, s) for s, i in bm25.search(toks, k=40)]
             s_hits = emb.semantic_rank(q, k=40, chunks=chunks)
             w_sem, w_bm25 = emb.adaptive_weights(q)
-            fused = emb.weighted_fuse(b_hits, s_hits, w_sem=w_sem, w_bm25=w_bm25)[:k]
+            fused = emb.weighted_fuse(b_hits, s_hits, w_sem=w_sem, w_bm25=w_bm25)
+            fused = emb.diversify(fused, chunks, max_per_paper=2, k=k)
             hit_papers = [chunks[idx]["paper"] for idx, _, _ in fused]
         else:
             hits = bm25.search(toks, k=k)

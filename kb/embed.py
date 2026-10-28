@@ -193,6 +193,26 @@ def adaptive_weights(query):
     return 0.75, 0.25        # 口语：保语义召回
 
 
+def diversify(hits, chunks, max_per_paper=2, k=None):
+    """
+    结果多样化：同一篇论文最多保留 max_per_paper 个块。
+
+    解决"块数多的论文霸榜"问题（pi07 有 59 块、genie 只有 18 块）。
+    hits: [(chunk_idx, fused, sem_score), ...] 已按 fused 降序
+    k 给定时最多返回 k 条；被压制的高分块会跳过，用下一篇的最高分顶上。
+    """
+    out, count = [], {}
+    for idx, fused, sem in hits:
+        paper = chunks[idx]["paper"]
+        if count.get(paper, 0) >= max_per_paper:
+            continue
+        count[paper] = count.get(paper, 0) + 1
+        out.append((idx, fused, sem))
+        if k and len(out) >= k:
+            break
+    return out
+
+
 def weighted_fuse(bm25_hits, sem_hits, w_sem=0.7, w_bm25=0.3):
     """
     加权融合（这个库小、块少，加权比 RRF 更合适——RRF 会把强语义信号拉平）。

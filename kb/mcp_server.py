@@ -113,9 +113,10 @@ def search(query: str, k: int = 8, paper: str = "", route: str = "") -> str:
             allowed = set(idxs)
             s_hits = [(i, s) for i, s in sem_all if i in allowed]
             w_sem, w_bm25 = emb.adaptive_weights(query)
-            fused = emb.weighted_fuse(b_hits, s_hits, w_sem=w_sem, w_bm25=w_bm25)[:k]
+            fused = emb.weighted_fuse(b_hits, s_hits, w_sem=w_sem, w_bm25=w_bm25)
+            fused = emb.diversify(fused, chunks, max_per_paper=2, k=k)
             hits_global = [(sem or fed, idx) for idx, fed, sem in fused]
-            mode_tag = f"混合检索(语义{w_sem:.2f}/词频{w_bm25:.2f})"
+            mode_tag = f"混合检索(语义{w_sem:.2f}/词频{w_bm25:.2f}, 每篇≤2块)"
         except Exception as e:
             hits_global = None
             mode_tag = f"BM25（语义检索失败：{e}）"
