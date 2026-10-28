@@ -36,6 +36,8 @@ def main():
     ap.add_argument("--paper", help="只查某篇，如 pi0、dreamerv3")
     ap.add_argument("--route", help="只查某路线，如 VLA、WAM、WM-latent")
     ap.add_argument("--kind", help="只查 paper / note / overview")
+    ap.add_argument("--semantic", action="store_true",
+                    help="混合检索：BM25 + 向量，RRF 融合（需先建向量，见 kb/embed.py）")
     a = ap.parse_args()
 
     chunks, tokens = load()
@@ -56,17 +58,49 @@ def main():
     sub_docs = [tokens[i] for i in idxs]
     bm25 = BM25(sub_docs)
     q = tokenize(a.query) + [a.query.lower()]  # 整串也当一个 token（型号名如 π0.5）
-    hits = bm25.search([t for t in q if t], k=a.k)
+    bm25_hits = bm25.search([t for t in q if t], k=min(len(idxs), max(a.k * 4, 40)))
+    # bm25_hits 里的下标是 sub_docs 的局部下标，映射回全局块下标
+    bm25_global = [(idxs[j], s) for s, j in bm25_hits]
+
+    hits = None
+    sem_display = {}
+    if a.semantic:
+        try:
+            import embed
+            if not embed.available():
+                print("提示：未配置向量层（KB_EMBED_BASE/KEY 或未建向量），回退纯 BM25")
+            else:
+                allowed = set(idxs)
+                sem_all = embed.semantic_rank(a.query, k=min(len(idxs), max(a.k * 4, 40)))
+                sem_global = [(i, s) for i, s in sem_all if i in allowed]
+                bm25_filtered = [(i, s) for i, s in bm25_global if i in allowed]
+                # 自适应权重：术语查询偏 BM25，口语查询偏语义
+                w_sem, w_bm25 = embed.adaptive_weights(a.query)
+                fused = embed.weighted_fuse(bm25_filtered, sem_global,
+                                            w_sem=w_sem, w_bm25=w_bm25)[: a.k]
+                hits = []
+                for idx, fused_score, sem_score in fused:
+                    hits.append((sem_score if sem_score is not None else fused_score, idx))
+                    sem_display[idx] = sem_score
+        except Exception as e:
+            print(f"提示：向量检索失败（{e}），回退纯 BM25")
+
+    if hits is None:
+        hits = [(s, idxs[j]) for s, j in bm25.search([t for t in q if t], k=a.k)]
 
     if not hits:
         print(f"没搜到：{a.query}")
         print("提示：换英文术语试试（如 'KV cache'、'flow matching timestep'）")
         return
 
+    use_sem = bool(sem_display)
     for rank, (s, j) in enumerate(hits, 1):
-        c = chunks[idxs[j]]
+        c = chunks[j]
         head = c["text"][:400].replace("\n", " ")
-        print(f"[{rank}] {c['paper']} · {c['route']} · {c['section']} {c['line']}  (score={s:.2f})")
+        tag = f"cos={s:.4f}" if use_sem else f"bm25={s:.2f}"
+        if use_sem and j not in sem_display:
+            tag = "bm25-only"
+        print(f"[{rank}] {c['paper']} · {c['route']} · {c['section']} {c['line']}  ({tag})")
         print(f"    {head}...")
         print()
 

@@ -41,7 +41,7 @@ QUERIES_A = [
     {"q": "机器人能听懂人话吗 指令跟随", "expected": ["pi05", "pi07"]},              # 语言指令
     {"q": "Minecraft 挖钻石", "expected": ["dreamerv3"]},                           # 150 任务
     {"q": "预测未来画面有什么用", "expected": ["unipi", "dreamzero", "fdm"]},        # 视频预测用途
-    {"q": "机器人手臂末端七个数字是什么", "expected": ["cosmos", "vjepa2"]},          # 7 维动作
+    {"q": "机器人手臂末端七个数字是什么", "expected": ["openvla", "pi0"]},            # 7 维动作
     {"q": "大模型能直接操控机器人吗", "expected": ["gemini4-argon"]},                 # Argon
 ]
 
@@ -61,15 +61,33 @@ def load():
     return chunks, tokens
 
 
-def evaluate(queries, label, k=5):
+def evaluate(queries, label, k=5, semantic=False):
     chunks, tokens = load()
     bm25 = BM25(tokens)
+    emb = None
+    if semantic:
+        try:
+            import embed
+            if embed.available():
+                emb = embed
+            else:
+                print("提示：向量层未配置或未建向量，本次按纯 BM25 评测")
+        except Exception as e:
+            print(f"提示：向量层不可用（{e}），本次按纯 BM25 评测")
+
     recalls, mrrs, misses = [], [], []
     for item in queries:
         q, expected = item["q"], item["expected"]
         toks = [t for t in tokenize(q) + [q.lower()] if t]
-        hits = bm25.search(toks, k=k)
-        hit_papers = [chunks[i]["paper"] for _, i in hits] if hits else []
+        if emb:
+            b_hits = [(i, s) for s, i in bm25.search(toks, k=40)]
+            s_hits = emb.semantic_rank(q, k=40)
+            w_sem, w_bm25 = emb.adaptive_weights(q)
+            fused = emb.weighted_fuse(b_hits, s_hits, w_sem=w_sem, w_bm25=w_bm25)[:k]
+            hit_papers = [chunks[idx]["paper"] for idx, _, _ in fused]
+        else:
+            hits = bm25.search(toks, k=k)
+            hit_papers = [chunks[i]["paper"] for _, i in hits] if hits else []
         # recall@k: 命中任意一个 expected 即算命中（宽松口径，标注可能多篇都对）
         hit = any(p in hit_papers for p in expected)
         recalls.append(1.0 if hit else 0.0)
@@ -94,12 +112,17 @@ def evaluate(queries, label, k=5):
 
 
 if __name__ == "__main__":
+    import sys
+    semantic = "--semantic" in sys.argv
     a = [q for q in QUERIES_A[:15]]
     b = [q for q in QUERIES_A[15:]]
-    r_a, m_a = evaluate(a, "A 组 · 术语查询（BM25 主场）")
-    r_b, m_b = evaluate(b, "B 组 · 口语化/中文查询（BM25 弱区）")
+    mode = "混合(BM25+语义, 自适应权重)" if semantic else "纯 BM25"
+    print(f"模式：{mode}")
+    r_a, m_a = evaluate(a, "A 组 · 术语查询", semantic=semantic)
+    r_b, m_b = evaluate(b, "B 组 · 口语化/中文查询", semantic=semantic)
     r_all = (r_a + r_b) / 2
     m_all = (m_a + m_b) / 2
     print(f"\n=== 总计（30 条）===")
     print(f"  Recall@5: {r_all:.1%}   MRR: {m_all:.3f}")
-    print(f"\n解读：A 组分数 = BM25 选型的实证；B 组分数 = agent 改写/向量层的真实需求大小")
+    if not semantic:
+        print("\n提示：加 --semantic 对比混合检索效果（需先建向量）")
