@@ -71,7 +71,8 @@ def main():
                 print("提示：未配置向量层（KB_EMBED_BASE/KEY 或未建向量），回退纯 BM25")
             else:
                 allowed = set(idxs)
-                sem_all = embed.semantic_rank(a.query, k=min(len(idxs), max(a.k * 4, 40)))
+                sem_all = embed.semantic_rank(a.query, k=min(len(idxs), max(a.k * 4, 40)),
+                                              chunks=chunks)
                 sem_global = [(i, s) for i, s in sem_all if i in allowed]
                 bm25_filtered = [(i, s) for i, s in bm25_global if i in allowed]
                 # 自适应权重：术语查询偏 BM25，口语查询偏语义

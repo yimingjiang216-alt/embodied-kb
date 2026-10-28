@@ -63,15 +63,18 @@ def roadmap() -> str:
 
 @mcp.tool
 def search(query: str, k: int = 8, paper: str = "", route: str = "") -> str:
-    """BM25 检索具身智能知识库（精读笔记 + 谱系总图；若本地拉过论文材料，还包含论文正文并带行号）。
+    """检索具身智能知识库（精读笔记 + 谱系总图；若本地拉过论文材料，还包含论文正文并带行号）。
 
     何时用：用户问到 VLA / 世界模型 / WAM 某篇论文的具体内容
     （架构、数字、机制、与其他论文的关系），需要有出处的回答时。
     先看返回里的 kind：note=笔记摘要，paper=论文正文。
 
+    检索方式：默认 BM25（词频）；若本地已建向量层（见 README「加语义检索」），
+    自动升级为 BM25 + 语义的混合检索，口语化问题和中文提问也能命中。
+
     Args:
         query: 查询词。英文术语最准（如 "flow matching timestep"、"KV cache"、
-               "advantage conditioning"）；中文仅对笔记和总图有效。
+               "advantage conditioning"）；建了向量层后可直接用中文口语提问。
         k: 返回条数，默认 8。
         paper: 只查某篇，如 pi0 / dreamerv3 / vpp2（目录名，可部分匹配）。
         route: 只查某路线：VLA / VLA+RL / WM-latent / WM-JEPA / WM-视频 /
@@ -91,21 +94,56 @@ def search(query: str, k: int = 8, paper: str = "", route: str = "") -> str:
 
     bm25 = BM25([tokens[i] for i in idxs])
     q = tokenize(query) + [query.lower()]
-    hits = bm25.search([t for t in q if t], k=min(k, 20))
-    if not hits:
+    qtokens = [t for t in q if t]
+
+    # 尝试混合检索（有向量层才启用）
+    emb = None
+    try:
+        import embed
+        if embed.available():
+            emb = embed
+    except Exception:
+        pass
+
+    mode_tag = ""
+    if emb:
+        try:
+            b_hits = [(idxs[j], s) for s, j in bm25.search(qtokens, k=min(len(idxs), 40))]
+            sem_all = emb.semantic_rank(query, k=min(len(idxs), 40), chunks=chunks)
+            allowed = set(idxs)
+            s_hits = [(i, s) for i, s in sem_all if i in allowed]
+            w_sem, w_bm25 = emb.adaptive_weights(query)
+            fused = emb.weighted_fuse(b_hits, s_hits, w_sem=w_sem, w_bm25=w_bm25)[:k]
+            hits_global = [(sem or fed, idx) for idx, fed, sem in fused]
+            mode_tag = f"混合检索(语义{w_sem:.2f}/词频{w_bm25:.2f})"
+        except Exception as e:
+            hits_global = None
+            mode_tag = f"BM25（语义检索失败：{e}）"
+    else:
+        hits_global = None
+
+    if hits_global is None:
+        raw = bm25.search(qtokens, k=min(k, 20))
+        hits_global = [(s, idxs[j]) for s, j in raw]
+        mode_tag = "BM25"
+
+    if not hits_global:
         return (f"没搜到：{query!r}\n"
                 "提示：BM25 是词频匹配。口语化问题请换成术语，"
                 '如"为什么预测错了动作会错" → "compounding error"')
 
     out = []
-    for rank, (s, j) in enumerate(hits, 1):
-        c = chunks[idxs[j]]
+    for rank, (s, gi) in enumerate(hits_global, 1):
+        c = chunks[gi]
         # 笔记是主打内容、本来就短 → 多给；论文正文块是片段 → 截短
         limit = 1800 if c["kind"] in ("note", "overview") else 500
         head = c["text"][:limit].replace("\n", " ")
-        out.append(f"[{rank}] ({c['kind']}) {c['paper']} · {c['route']} · {c['section']} {c['line']} (score={s:.2f})\n{head}")
+        score_txt = f"cos={s:.3f}" if emb and s <= 1.0 else f"score={s:.2f}"
+        out.append(f"[{rank}] ({c['kind']}) {c['paper']} · {c['route']} · "
+                   f"{c['section']} {c['line']} ({score_txt})\n{head}")
+
     has_papers = any(c["kind"] == "paper" for c in chunks)
-    tail = "\n— 回答请基于以上内容并注明来自哪篇；检索不到的不要编造。"
+    tail = f"\n— 检索方式：{mode_tag}。回答请基于以上内容并注明来自哪篇；检索不到的不要编造。"
     if not has_papers:
         tail += ("\n— 当前只加载了精读笔记（未拉论文原文）。需要原文级细节时，"
                  "按 README 用 fetch_all.py 拉取论文后重建索引。")

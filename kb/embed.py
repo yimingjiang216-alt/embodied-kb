@@ -113,8 +113,14 @@ def load_vectors():
     return np.load(VEC_FILE)
 
 
-def semantic_rank(query, k=None):
-    """返回 [(chunk_idx, score), ...] 按余弦相似度降序。"""
+def semantic_rank(query, k=None, chunks=None, per_paper_norm=False):
+    """
+    返回 [(chunk_idx, score), ...] 按余弦相似度降序。
+
+    per_paper_norm 默认关闭：实测"减去篇内均值"会反向奖励块数少的论文
+    （gemini4-argon 只有 1 块，均值极低，减完反而霸榜），B 组召回从 86.7% 掉到 66.7%。
+    保留参数以便将来换更好的归一化方式（如篇内 z-score 或按篇 rank 混合）。
+    """
     import numpy as np
     arr = load_vectors()
     if arr is None:
@@ -124,6 +130,19 @@ def semantic_rank(query, k=None):
     arr_n = arr / (np.linalg.norm(arr, axis=1, keepdims=True) + 1e-9)
     qv_n = qv / (np.linalg.norm(qv) + 1e-9)
     sims = arr_n @ qv_n
+
+    if per_paper_norm and chunks is not None and len(chunks) == len(sims):
+        from collections import defaultdict
+        groups = defaultdict(list)
+        for i, c in enumerate(chunks):
+            groups[c["paper"]].append(i)
+        for paper, idxs in groups.items():
+            if len(idxs) < 10:      # 块太少不归一化（样本不足，均值不可靠）
+                continue
+            m = float(np.mean(sims[idxs]))
+            for i in idxs:
+                sims[i] -= m
+
     order = np.argsort(-sims)
     if k:
         order = order[:k]
