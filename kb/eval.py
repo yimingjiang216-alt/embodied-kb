@@ -82,8 +82,7 @@ def evaluate(queries, label, k=5, semantic=False):
         if emb:
             b_hits = [(i, s) for s, i in bm25.search(toks, k=40)]
             s_hits = emb.semantic_rank(q, k=40, chunks=chunks)
-            w_sem, w_bm25 = emb.adaptive_weights(q)
-            fused = emb.weighted_fuse(b_hits, s_hits, w_sem=w_sem, w_bm25=w_bm25)
+            fused = emb.rrf_fuse(b_hits, s_hits)
             fused = emb.diversify(fused, chunks, max_per_paper=2, k=k)
             hit_papers = [chunks[idx]["paper"] for idx, _, _ in fused]
         else:
@@ -117,7 +116,7 @@ if __name__ == "__main__":
     semantic = "--semantic" in sys.argv
     a = [q for q in QUERIES_A[:15]]
     b = [q for q in QUERIES_A[15:]]
-    mode = "混合(BM25+语义, 自适应权重)" if semantic else "纯 BM25"
+    mode = "混合检索(BM25 + 语义, RRF k=5, 每篇≤2块)" if semantic else "纯 BM25"
     print(f"模式：{mode}")
     r_a, m_a = evaluate(a, "A 组 · 术语查询", semantic=semantic)
     r_b, m_b = evaluate(b, "B 组 · 口语化/中文查询", semantic=semantic)

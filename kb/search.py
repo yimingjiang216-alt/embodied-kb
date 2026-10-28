@@ -75,10 +75,8 @@ def main():
                                               chunks=chunks)
                 sem_global = [(i, s) for i, s in sem_all if i in allowed]
                 bm25_filtered = [(i, s) for i, s in bm25_global if i in allowed]
-                # 自适应权重：术语查询偏 BM25，口语查询偏语义
-                w_sem, w_bm25 = embed.adaptive_weights(a.query)
-                fused = embed.weighted_fuse(bm25_filtered, sem_global,
-                                            w_sem=w_sem, w_bm25=w_bm25)
+                # RRF 融合（工业标准做法，只看排名不看分数量纲）
+                fused = embed.rrf_fuse(bm25_filtered, sem_global)
                 # 多样化：同一篇最多 2 块，防止长篇论文霸榜
                 fused = embed.diversify(fused, chunks, max_per_paper=2, k=a.k)
                 hits = []
