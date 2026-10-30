@@ -120,43 +120,99 @@ claude mcp add paper-kb -- python "<仓库绝对路径>/kb/mcp_server.py"
 
 ## 用法二：命令行
 
+两条路线，按需选一条。**下面的命令都是完整可跑的最小集合。**
+
+### 路线 A：纯 BM25（零配置，推荐先试这个）
+
+不需要 API key、不需要下载模型、不需要装额外依赖。
+
 ```bash
-python kb/build.py
+git clone https://github.com/yimingjiang216-alt/embodied-kb.git
+cd embodied-kb
+
+python kb/build.py                       # 建索引，几秒
 python kb/search.py "advantage conditioning"
-python kb/search.py "compounding error" --route WAM
-python kb/search.py "机器人怎么会自己想" --semantic   # 需先配 embedding 端点，见"可选：加语义检索"
+python kb/search.py "KV cache" -k 5      # 只看前 5 条
+python kb/search.py "compounding error" --route WAM    # 按路线过滤
+python kb/search.py "value function" --paper pistar06  # 按论文过滤
 ```
 
-## 检索能力一览（两档，互不干扰）
+**能搜到**：英文术语、型号名（`KV cache`、`π0.5`、`flow matching`）。
+**搜不到**：纯中文口语（"机器人怎么会自己想"）——需要路线 B。
 
-| | 需要什么 | 能搜到什么 | 适用 |
-|---|---|---|---|
-| **纯 BM25**（默认） | 无 | 英文术语、型号名（`KV cache`、`π0.5`） | 大多数人够用 |
-| **混合检索**（可选） | 一个 OpenAI 兼容的 embedding 端点 | 上面这些 **+ 口语化/中文** | 想直接问中文的人 |
+> 想用中文提问又不配任何东西？让 agent 先改写。在 MCP 客户端的系统提示里加一句：
+> "用户用中文提问时，先把问题翻译成 2-3 组英文术语再调 search，例如 '机器人怎么会自己想' → `imagination rollout` / `latent world model training`。"
 
-**怎么切换**：设了 `KB_EMBED_BASE` / `KB_EMBED_KEY` 且建过向量，就自动走混合；没有就自动退回纯 BM25。**代码里没有分支开关，配了就生效。**
+### 路线 B：加嵌入模型（混合检索，口语/中文也能搜）
 
-### 可选升级 A：加语义检索（让口语/中文也能搜到）
+**前提**：你有一个 OpenAI 兼容的 embedding 端点（OpenAI、智谱、硅基流动、vLLM 自部署、Gemini 代理……都行）。
 
 ```bash
-# 1. 配置任意 OpenAI 兼容的 embedding 端点
-set KB_EMBED_BASE=https://your-endpoint/v1
-set KB_EMBED_KEY=sk-xxxx
-# 可选：set KB_EMBED_MODEL=<模型名>
+# 1. 装依赖（只有 numpy，一般已有）
+pip install numpy
 
-# 2. 建向量（877 块，逐条请求约 8 分钟）
+# 2. 配端点（Windows PowerShell）
+$env:KB_EMBED_BASE = "https://your-endpoint/v1"
+$env:KB_EMBED_KEY  = "sk-xxxx"
+# $env:KB_EMBED_MODEL = "text-embedding-3-small"   # 可选，默认 vertex_ai/gemini-embedding-2
+
+#    （macOS / Linux）
+export KB_EMBED_BASE="https://your-endpoint/v1"
+export KB_EMBED_KEY="sk-xxxx"
+
+# 3. 建索引 + 建向量（877 块，逐条请求约 8 分钟）
+python kb/build.py
 python kb/build_vectors.py
 
-# 3. 用混合检索
+# 4. 用混合检索
 python kb/search.py "机器人怎么会自己想" --semantic
+python kb/search.py "flow matching timestep" --semantic   # 术语查询照样准
 ```
 
-- 完全可选——不配环境变量就还是纯 BM25，零影响
-- 向量存在 `kb/index/vectors.npy`（已在 .gitignore，不进仓库）
-- 建库和查询必须用同一个模型（换模型要重建）
-- **RRF 融合**（工业标准）：score = Σ 1/(k+rank)，k=5；只看排名不看绝对分数，天然免疫两路分数量纲不同
+**永久保存环境变量**（免得每次重设）：
 
-### 可选升级 B：把检索从"笔记"扩到"论文全文"
+```powershell
+# Windows：写进用户环境变量，重开窗口仍有效
+[Environment]::SetEnvironmentVariable("KB_EMBED_BASE", "https://your-endpoint/v1", "User")
+[Environment]::SetEnvironmentVariable("KB_EMBED_KEY", "sk-xxxx", "User")
+```
+
+```bash
+# macOS / Linux：追加到 ~/.bashrc 或 ~/.zshrc
+echo 'export KB_EMBED_BASE="https://your-endpoint/v1"' >> ~/.zshrc
+echo 'export KB_EMBED_KEY="sk-xxxx"' >> ~/.zshrc
+```
+
+**验证是否生效**：`search --semantic` 正常返回结果就说明生效；没配好会打印"未配置向量层，回退纯 BM25"。
+
+**MCP 里也一样**：配好环境变量并建完向量后，agent 调 `search()` 会自动走混合检索（返回结果末尾会标注 `RRF k=5`）。**不用改任何配置。**
+
+### 两档能力对比
+
+| | 需要什么 | 能搜到什么 | 建库耗时 |
+|---|---|---|---|
+| **纯 BM25**（默认） | 无 | 英文术语、型号名 | 几秒 |
+| **混合检索** | embedding 端点 + 8 分钟建向量 | 上面这些 **+ 口语化/中文** | 约 8 分钟 |
+
+**切换逻辑**：设了环境变量且建过向量 → 自动混合；否则自动纯 BM25。代码里没有开关。
+
+### 几个注意点
+
+- **建库和查询必须用同一个模型**（向量坐标系不同，换了要重跑 `build_vectors.py`）
+- 向量存 `kb/index/vectors.npy`，已在 `.gitignore`，**不进仓库**
+- 部分端点（如常见的聚合代理）**批量输入只返回第 1 条**，所以脚本是逐条请求的，慢但正确
+- 切块数会变（加了新论文）就要**重新建索引 + 重建向量**，两者必须一起更新
+
+### 可选升级：把检索从"笔记"扩到"论文全文"
+
+默认只索引笔记与总图，开箱 10 秒可用。想让 `search` 也能命中论文正文（并带 `paper.tex` 行号核对原文）：
+
+```bash
+git clone https://github.com/skJack/kelip-paper-reading.git   # 抓取脚本
+pip install pymupdf
+python kb/fetch_all.py        # 按笔记里的 arXiv 编号拉取，并核对标题防拉错
+python kb/build.py            # 重建索引
+```
 
 默认只索引笔记与总图，开箱 10 秒可用。想让 `search` 也能命中论文正文（并带 `paper.tex` 行号核对原文）：
 
@@ -174,7 +230,7 @@ python kb/build.py            # 重建索引
 
 ```bash
 python kb/eval.py                      # 纯 BM25
-python kb/eval.py --semantic           # 混合检索（需先建向量，见下节）
+python kb/eval.py --semantic           # 混合检索（需先建向量，见"路线 B"）
 ```
 
 | 查询类型 | BM25 单路 | **混合检索（BM25 + 语义）** |
