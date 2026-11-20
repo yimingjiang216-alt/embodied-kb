@@ -75,7 +75,7 @@
 | | Genie 1（动作接口从视频无监督发现） |
 | **WAM** | DreamZero、VPP2 |
 | **范式修正** | FDM（action-to-future） |
-| **导航** | VLN-CE（连续环境基准）→ VLN 综述（三层框架）→ NaVid（视频 VLM，不用深度） |
+| **导航** | VLN-CE（连续环境基准）→ VLN 综述（三层框架）→ NaVid（视频 VLM，不用深度）→ **MCP-3DGS**（3DGS 开放词汇空间定位 + VLN 候选视角想象 + ESDF 三维规划） |
 | **仿真器** | Isaac Lab（数据从哪来 / sim2real 差距归因） |
 | **LLM 路线** | Gemini 4 Argon（博客） |
 
