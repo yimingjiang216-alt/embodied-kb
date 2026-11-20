@@ -22,6 +22,9 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 ROOT = Path(__file__).resolve().parent.parent
 PAPERS = ROOT / "papers"
 NOTES = ROOT / "notes"
@@ -38,6 +41,7 @@ ROUTE = {
     "dreamgen": "WM-数据工厂", "dreamzero": "WAM", "vpp2": "WAM",
     "fdm": "范式修正", "gemini4-argon": "LLM路线", "isaaclab": "仿真",
     "vlnce": "VLN", "vln-survey": "VLN", "navid": "VLN",
+    "supermimic": "WM-状态",
     "01-认知架构": "框架",
 }
 
