@@ -48,6 +48,6 @@
 
 - **所属层级**：**大脑（空间记忆 + 主动感知预演 + 工具编排）**
 - **与本库其他模块的关系**：
-  - 向上承接 [`rgbd-slam`](https://github.com/yimingjiang216-alt/rgbd-slam)（提供相机位姿与稀疏地图）与 [`sfm-push`](https://github.com/yimingjiang216-alt/sfm-push)（提供 3DGS 表征）；
+  - 向上承接 [`rgbd-slam`](https://github.com/yimingjiang216-alt/rgbd-slam)（提供相机位姿与稀疏地图）与 [`sfm-3dgs-pipeline`](https://github.com/yimingjiang216-alt/sfm-3dgs-pipeline)（提供 3DGS 表征）；
   - 横向补齐 [`notes/01-认知架构.md`](01-认知架构.md) 中**大脑层的四项核心标准**：① 主动生成中间观测目标（NBV 视角）② 在 3DGS 世界模型中预演并比较视角与反事实编辑后果 ③ 调用外部空间工具与持久三维记忆（FastMCP）；
   - 向下为运动皮层（VLA）与小脑（[`supermimic-g1-sim`](https://github.com/yimingjiang216-alt/supermimic-g1-sim) 全身控制器）提供世界系下的无碰撞三维路点与目标位姿。
