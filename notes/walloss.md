@@ -1,6 +1,7 @@
-# 精读笔记 · Wall-OSS 0.5
+# 精读笔记 · Wall-OSS（0.5 协同训练配方 → 1.0 Lite RoboDojo & Wall-WM 2.0）
 
-> arXiv 2605.30877 · 小鹏（X-Square-Robot/wall-x 开源）· 2026-05 · 技术报告
+> Wall-OSS 0.5: arXiv 2605.30877 · 自变量机器人（X-Square-Robot/wall-x 开源）· 2026-05
+> Wall-OSS 1.0 Lite & Wall-WM 2.0: HuggingFace `x-square-robot/wall-oss-1.0-lite-robodojo` & `wall-wm-2.0-robodojo` · 2026-10 / 2026-11
 
 ## 基本情况
 
@@ -67,3 +68,16 @@ L = L_flow + 0.01·L_act-CE + 0.01·L_mm-CE
 - 与 π 谱系的交锋：π 的"预训练见多识广/后训练学会干活"分工 → Wall-OSS 模糊化分工（预训练即行为）
 - 与 FDM 问题互补：FDM 问"未来信号怎么用"，Wall-OSS 问"动作信号塑造了什么"（答案：桥+锚）
 - 2026 VLA 训练配方之争最清晰的一次交锋：stop-gradient vs 梯度全通，带开源权重可验证
+
+---
+
+## 2026-11 最新演进：Wall-OSS 1.0 Lite（RoboDojo）与 Wall-WM 2.0
+
+1. **主干升级为 3:1 线性注意力混合架构（`Qwen3.5-4B`，总参数 5.32B）**：
+   - 32 层 Transformer 采用每 3 层 `linear_attention`（Mamba-SSM 线性复杂度）+ 1 层 `full_attention` 交替排列，上下文窗口达 262,144，使机器人能以极低显存开销吃入长程多帧历史视频。
+2. **关键帧记忆（Keyframe Memory）攻克长程记忆依赖任务**：
+   - 模型在滑动窗口内主动回看近期头部相机画面并决定保留哪些关键帧，解决了 `RoboDojo` 基准中诸如 `swap_blocks`（先把积木移到旁边再换位，中间目标脱离当前视野）等强记忆依赖任务。
+3. **32 步末端位姿 + 4 遍串联残差精炼（4-Pass Residual Refiner）**：
+   - 保留 MoT 双塔（主干 2560 维 + 动作专家 1280 维）与 $\text{Beta}(1.5, 1.0)$ 10 步 Flow Matching，针对双臂 `arx_x5` 一次输出 32 步末端位姿（EE-pose），并经 4 遍串联残差精炼器逐步修正高频轨迹抖动。
+4. **配套世界模型 `Wall-WM 2.0`**：
+   - 基于 `Qwen3.5-9B` + `Wan2.2` 视频扩散底座构建动作条件世界模型，与 `X-Planner-9B`（大脑规划）、`Wall-OSS 1.0 Lite`（运动皮层）构成完整闭环。

@@ -64,20 +64,20 @@
    ──── 越往右：物理越具体、动作接口越真、错误越滚雪球 ────▶
 ```
 
-**26 篇论文的精读笔记**，每篇 30–60 行：路线标签 / 一句话 / 关键数字 / 它修了前人的什么 / 谱系位置。
+**36 份核心工作的精读笔记**，每篇 30–60 行：路线标签 / 一句话 / 关键数字 / 它修了前人的什么 / 谱系位置。
 
 | 路线 | 论文 |
 |---|---|
-| **VLA** | **OpenVLA**（开源标杆，离散 token）｜π0 → FAST → π0.5 → GR00T N1 → π\*0.6（RL，从 π0.6 学经验）→ π0.7 |
-| **世界模型** | World Models(2018) → PlaNet → Dreamer → DreamerV3 → V-JEPA 2 |
-| | **SuperMimic**（物理状态空间可微动力学 + 32步 BPTT，小脑全身控制） |
-| | UniPi → Cosmos → DreamGen（视频系的三种用法） |
-| | Genie 1（动作接口从视频无监督发现） |
-| **WAM** | DreamZero、VPP2 |
+| **模仿底座** | **ACT & ALOHA**（Action Chunking + 时序集成 + CVAE）｜**Diffusion Policy**（条件 DDPM/DDIM 动作去噪 + 滚动时域控制） |
+| **VLA** | **RT-2**（VLA 命名作）→ **Octo**（OXE 开源跨本体）→ **OpenVLA**（7B 开源标杆）→ **RDT-1B**（1.2B 双臂 + 128 维物理统一动作空间）→ **AgiBot GO-1**（百万真机轨迹 + ViLLA 隐式动作规划）｜π0 → FAST → π0.5 → GR00T N1 → π\*0.6 → π0.7｜**Wall-OSS 0.5 & 1.0 Lite**（梯度桥接 + Qwen3.5 线性注意力 + 关键帧记忆）→ **LingBot-VLA 2.0** |
+| **3D 策略与空间** | **DP3**（单视角 3D 点云扩散策略）→ **3D-VLA**（3D LLM + 目标生成）→ **MCP-3DGS**（3DGS 开放词汇空间定位 + VLN 候选视角想象 + ESDF 三维规划） |
+| **大脑规划与语音** | **X-Planner-9B**（事件结构化 / Staircase 潜状态大脑规划）｜**X2-Turn-4B**（80ms 帧同步实时语音 ASR + 6 类话轮预测）｜**Gemini 4 Argon**（LLM 代码工具编排） |
+| **世界模型** | World Models(2018) → PlaNet → Dreamer → DreamerV3 → V-JEPA 2｜UniPi → Cosmos → DreamGen（视频系的三种用法）｜Genie 1（无监督潜动作发现） |
+| **WAM** | DreamZero、VPP2、Wall-WM 2.0 |
+| **小脑全身控制** | **BeyondMimic**（G1 29-DoF 等效惯量解析 PD + 引导扩散）→ **SuperMimic**（物理状态空间可微动力学 + 32 步 BPTT，单卡 3h 超百卡 PPO） |
 | **范式修正** | FDM（action-to-future） |
-| **导航** | VLN-CE（连续环境基准）→ VLN 综述（三层框架）→ NaVid（视频 VLM，不用深度）→ **MCP-3DGS**（3DGS 开放词汇空间定位 + VLN 候选视角想象 + ESDF 三维规划） |
+| **导航** | VLN-CE（连续环境基准）→ VLN 综述（三层框架）→ NaVid（视频 VLM，不用深度） |
 | **仿真器** | Isaac Lab（数据从哪来 / sim2real 差距归因） |
-| **LLM 路线** | Gemini 4 Argon（博客） |
 
 ## 用法一：连上 MCP，直接问（推荐）
 

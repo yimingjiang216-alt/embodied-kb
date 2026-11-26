@@ -32,6 +32,8 @@ INDEX_DIR = Path(__file__).resolve().parent / "index"
 
 # ---------------- 路线标签 ----------------
 ROUTE = {
+    "act": "模仿底座", "diffusion-policy": "模仿底座",
+    "rt2-octo": "VLA", "rdt1b": "VLA", "agibot-go1": "VLA", "dp3-3dvla": "3D-VLA",
     "pi0": "VLA", "pi05": "VLA", "pi07": "VLA", "fast": "VLA-工具",
     "gr00t": "VLA", "pistar06": "VLA+RL",
     "worldmodels": "WM-latent", "dreamer": "WM-latent", "dreamerv3": "WM-latent",
@@ -41,7 +43,8 @@ ROUTE = {
     "dreamgen": "WM-数据工厂", "dreamzero": "WAM", "vpp2": "WAM",
     "fdm": "范式修正", "gemini4-argon": "LLM路线", "isaaclab": "仿真",
     "vlnce": "VLN", "vln-survey": "VLN", "navid": "VLN",
-    "supermimic": "WM-状态",
+    "beyondmimic": "WBC-小脑", "supermimic": "WM-状态",
+    "xplanner-x2turn": "大脑-语音", "mcp-3dgs": "3DGS-空间",
     "01-认知架构": "框架",
 }
 
