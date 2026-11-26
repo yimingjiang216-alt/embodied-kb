@@ -41,7 +41,7 @@ QUERIES_A = [
     {"q": "机器人能听懂人话吗 指令跟随", "expected": ["pi05", "pi07"]},              # 语言指令
     {"q": "Minecraft 挖钻石", "expected": ["dreamerv3"]},                           # 150 任务
     {"q": "预测未来画面有什么用", "expected": ["unipi", "dreamzero", "fdm"]},        # 视频预测用途
-    {"q": "机器人手臂末端七个数字是什么", "expected": ["openvla", "pi0"]},            # 7 维动作
+    {"q": "机器人手臂末端七个数字是什么", "expected": ["openvla", "pi0", "rt2-octo"]}, # 7 维动作
     {"q": "大模型能直接操控机器人吗", "expected": ["gemini4-argon"]},                 # Argon
 ]
 
