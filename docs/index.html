@@ -3,646 +3,696 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Embodied-KB · 具身智能与世界模型交互谱系 (36 篇精读 + 实时检索 + 实操展厅)</title>
+<title>Embodied-KB · Archify 交互式具身智能与世界模型架构图谱 (36 篇)</title>
 <style>
   :root {
-    --bg: #0b0f19;
-    --panel: #111827;
-    --panel-2: #1e293b;
-    --border: #26334d;
+    --bg: #06080f;
+    --glass: rgba(13, 18, 30, 0.84);
+    --glass-2: rgba(22, 30, 49, 0.78);
+    --border: rgba(148, 163, 184, 0.16);
+    --border-hi: rgba(96, 165, 250, 0.55);
     --ink: #f8fafc;
     --body: #cbd5e1;
-    --muted: #94a3b8;
-    --accent: #3b82f6;
-    --accent-2: #60a5fa;
-    --accent-bg: rgba(59, 130, 246, 0.14);
-    --green: #10b981;
+    --muted: #64748b;
+    --blue: #3b82f6;
+    --cyan: #06b6d4;
+    --emerald: #10b981;
     --amber: #f59e0b;
     --purple: #a855f7;
     --rose: #f43f5e;
-    --cyan: #06b6d4;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei UI", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei UI", sans-serif;
     background: var(--bg);
     color: var(--body);
-    line-height: 1.55;
-    min-height: 100vh;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    user-select: none;
   }
-  a { color: var(--accent-2); text-decoration: none; }
+  a { color: #60a5fa; text-decoration: none; }
   a:hover { text-decoration: underline; }
 
-  /* ── Top Navigation Bar ── */
-  .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(11, 15, 25, 0.88);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 24px;
+  /* ── Top Floating Glass Header (Archify Style) ── */
+  .top-hud {
+    position: fixed;
+    top: 14px;
+    left: 16px;
+    right: 16px;
+    z-index: 200;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
+    pointer-events: none;
     gap: 12px;
+    flex-wrap: wrap;
   }
-  .brand {
+  .hud-box {
+    pointer-events: auto;
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px 14px;
     display: flex;
     align-items: center;
     gap: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
   }
-  .brand-logo {
-    width: 34px;
-    height: 34px;
+  .logo-badge {
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
-    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
-    color: #fff;
-    font-size: 16px;
-  }
-  .brand h1 {
-    font-size: 17px;
-    font-weight: 800;
-    color: var(--ink);
-    letter-spacing: 0.3px;
-  }
-  .brand .sub {
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .nav-tabs {
-    display: flex;
-    gap: 6px;
-    background: var(--panel);
-    padding: 4px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  .tab-btn {
-    background: transparent;
-    color: var(--muted);
-    border: 0;
-    padding: 7px 14px;
-    border-radius: 7px;
+    font-weight: 900;
     font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .tab-btn:hover { color: var(--ink); }
-  .tab-btn.active {
-    background: var(--accent);
     color: #fff;
-    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.35);
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
   }
-  .gh-btn {
-    background: var(--panel-2);
-    border: 1px solid var(--border);
+  .brand-title {
+    font-size: 14.5px;
+    font-weight: 800;
     color: var(--ink);
-    padding: 7px 14px;
+    letter-spacing: 0.2px;
+  }
+  .brand-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .mode-tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .mode-btn {
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid transparent;
+    padding: 6px 12px;
     border-radius: 8px;
     font-size: 12.5px;
     font-weight: 600;
+    cursor: pointer;
+    transition: all 0.16s;
+  }
+  .mode-btn:hover { color: var(--ink); background: rgba(255,255,255,0.04); }
+  .mode-btn.active {
+    background: rgba(59, 130, 246, 0.18);
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.45);
+    box-shadow: 0 0 14px rgba(59, 130, 246, 0.22);
+  }
+
+  /* ── Route & Legend Filter Bar (Bottom Left HUD) ── */
+  .bottom-hud {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    z-index: 200;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    pointer-events: none;
+  }
+  .legend-item {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-  }
-  .gh-btn:hover { border-color: var(--accent); text-decoration: none; }
-
-  .container {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 20px 24px 48px;
-  }
-  .view-pane { display: none; }
-  .view-pane.active { display: block; }
-
-  /* ── Spectrum Strip ── */
-  .spectrum-box {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 18px;
-  }
-  .spectrum-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .spectrum-head h2 {
-    font-size: 14.5px;
-    color: var(--ink);
-    font-weight: 700;
-  }
-  .spectrum-head span {
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .spectrum-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
-  }
-  @media (max-width: 980px) {
-    .spectrum-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  .spec-stage {
-    background: rgba(30, 41, 59, 0.65);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .spec-stage:hover, .spec-stage.active {
-    border-color: var(--accent);
-    background: var(--accent-bg);
-  }
-  .spec-stage .st-num {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--accent-2);
-    text-transform: uppercase;
-  }
-  .spec-stage .st-name {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink);
-    margin: 2px 0;
-  }
-  .spec-stage .st-rep {
     font-size: 11.5px;
-    color: var(--muted);
+    color: #94a3b8;
   }
-
-  /* ── Route Filter Pills ── */
-  .filter-bar {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 18px;
-    align-items: center;
+  .legend-line {
+    width: 22px;
+    height: 2.5px;
+    border-radius: 2px;
   }
-  .pill-btn {
-    background: var(--panel);
+  .ctrl-btn {
+    background: rgba(30, 41, 59, 0.75);
     border: 1px solid var(--border);
     color: var(--body);
-    padding: 5px 12px;
-    border-radius: 999px;
-    font-size: 12.5px;
+    padding: 5px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.15s;
   }
-  .pill-btn:hover { border-color: var(--accent-2); color: var(--ink); }
-  .pill-btn.active {
-    background: var(--accent);
-    border-color: var(--accent);
+  .ctrl-btn:hover, .ctrl-btn.active {
+    border-color: #60a5fa;
     color: #fff;
+    background: rgba(59, 130, 246, 0.22);
   }
 
-  /* ── Main Split Layout: Left Cognitive Stack + Right Inspector ── */
-  .split-layout {
-    display: grid;
-    grid-template-columns: 1.25fr 1fr;
-    gap: 20px;
-    align-items: start;
-  }
-  @media (max-width: 1080px) {
-    .split-layout { grid-template-columns: 1fr; }
-  }
-  .layer-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 15px 18px;
-    margin-bottom: 14px;
-  }
-  .layer-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 10px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
-  }
-  .layer-head h3 {
-    font-size: 14.5px;
-    font-weight: 700;
-    color: var(--ink);
-  }
-  .layer-head .clock {
-    font-size: 11.5px;
-    color: var(--muted);
-    font-family: Consolas, monospace;
-  }
-  .paper-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
-    gap: 10px;
-  }
-  .paper-node {
-    background: rgba(30, 41, 59, 0.55);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 10px 12px;
-    cursor: pointer;
-    transition: all 0.15s;
+  /* ── Archify Dot-Matrix Interactive Canvas ── */
+  #canvas-viewport {
+    width: 100vw;
+    height: 100vh;
     position: relative;
+    overflow: hidden;
+    cursor: grab;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(rgba(148, 163, 184, 0.16) 1px, transparent 1px),
+      radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.08), transparent 45%),
+      radial-gradient(circle at 80% 75%, rgba(16, 185, 129, 0.06), transparent 45%);
+    background-size: 24px 24px, 100% 100%, 100% 100%;
   }
-  .paper-node:hover {
-    border-color: var(--accent-2);
-    transform: translateY(-1px);
+  #canvas-viewport.dragging { cursor: grabbing; }
+
+  #canvas-world {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2360px;
+    height: 1220px;
+    transform-origin: 0 0;
+    will-change: transform;
   }
-  .paper-node.selected {
-    border-color: var(--accent);
-    background: var(--accent-bg);
-    box-shadow: 0 0 0 1px var(--accent);
+
+  /* ── Swimlane Backgrounds & Time Columns ── */
+  .swimlane {
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.08);
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.52) 0%, rgba(15, 23, 42, 0.18) 100%);
+    pointer-events: none;
   }
-  .paper-node .p-top {
+  .lane-tag {
+    position: absolute;
+    left: 16px;
+    top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .lane-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .lane-name {
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    color: #e2e8f0;
+  }
+  .lane-desc {
+    font-size: 11px;
+    color: #64748b;
+    margin-left: 6px;
+  }
+
+  .time-col-header {
+    position: absolute;
+    top: 24px;
+    height: 32px;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  /* ── SVG Edges Layer ── */
+  #edges-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .edge-path {
+    fill: none;
+    stroke: rgba(148, 163, 184, 0.22);
+    stroke-width: 1.8px;
+    transition: opacity 0.22s, stroke 0.22s, stroke-width 0.22s;
+  }
+  .edge-path.rivalry {
+    stroke: rgba(245, 158, 11, 0.35);
+    stroke-dasharray: 5 5;
+  }
+  .edge-path.dimmed {
+    opacity: 0.06;
+  }
+  .edge-path.hi-anc {
+    stroke: #10b981;
+    stroke-width: 2.8px;
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.55));
+  }
+  .edge-path.hi-desc {
+    stroke: #38bdf8;
+    stroke-width: 2.8px;
+    opacity: 1;
+    stroke-dasharray: 8 4;
+    animation: flowDash 0.9s linear infinite;
+    filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.6));
+  }
+  .edge-path.hi-rival {
+    stroke: #f43f5e;
+    stroke-width: 2.8px;
+    stroke-dasharray: 5 4;
+    opacity: 1;
+    filter: drop-shadow(0 0 7px rgba(244, 63, 94, 0.65));
+  }
+  @keyframes flowDash {
+    to { stroke-dashoffset: -24; }
+  }
+
+  .edge-label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background: rgba(11, 15, 25, 0.92);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    color: #cbd5e1;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1.5px 6px;
+    border-radius: 99px;
+    pointer-events: none;
+    z-index: 15;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.18s;
+  }
+  .edge-label.show { opacity: 1; }
+  .edge-label.rival-lbl {
+    border-color: rgba(244, 63, 94, 0.6);
+    color: #fda4af;
+    background: rgba(35, 10, 20, 0.92);
+  }
+
+  /* ── Archify Node Cards ── */
+  .arch-node {
+    position: absolute;
+    width: 178px;
+    background: rgba(17, 24, 39, 0.92);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 10px;
+    padding: 8px 10px;
+    cursor: pointer;
+    z-index: 20;
+    transition: transform 0.16s, border-color 0.16s, opacity 0.2s, box-shadow 0.16s;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.38);
+  }
+  .arch-node:hover {
+    transform: translateY(-2px) scale(1.02);
+    border-color: #60a5fa;
+    z-index: 30;
+  }
+  .arch-node.dimmed {
+    opacity: 0.18;
+    filter: grayscale(40%);
+  }
+  .arch-node.active {
+    border-color: #38bdf8;
+    background: rgba(23, 37, 84, 0.92);
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.45), 0 0 24px rgba(59, 130, 246, 0.45);
+    z-index: 35;
+  }
+  .arch-node.anc-node {
+    border-color: #10b981;
+    box-shadow: 0 0 0 1.5px rgba(16, 185, 129, 0.45), 0 0 16px rgba(16, 185, 129, 0.25);
+  }
+  .arch-node.desc-node {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 1.5px rgba(56, 189, 248, 0.45), 0 0 16px rgba(56, 189, 248, 0.25);
+  }
+  .arch-node.rival-node {
+    border-color: #f43f5e;
+    box-shadow: 0 0 0 1.5px rgba(244, 63, 94, 0.5), 0 0 16px rgba(244, 63, 94, 0.28);
+  }
+  .n-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 4px;
+    gap: 4px;
+    margin-bottom: 3px;
   }
-  .paper-node .p-title {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--ink);
+  .n-title {
+    font-size: 12.2px;
+    font-weight: 800;
+    color: #f8fafc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .paper-node .p-badge {
-    font-size: 10.5px;
+  .n-tag {
+    font-size: 9.5px;
     font-weight: 700;
-    padding: 1px 6px;
+    padding: 0.5px 5px;
     border-radius: 4px;
-    background: rgba(59, 130, 246, 0.2);
-    color: var(--accent-2);
     white-space: nowrap;
   }
-  .paper-node .p-meta {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 5px;
+  .n-sub {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .paper-node .p-desc {
-    font-size: 11.8px;
-    color: var(--body);
+  .n- hooks {
+    font-size: 10.5px;
+    color: #cbd5e1;
+    line-height: 1.32;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+  /* Port dots on left & right of node */
+  .port-l, .port-r {
+    position: absolute;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #475569;
+    transform: translateY(-50%);
+  }
+  .port-l { left: -3.5px; }
+  .port-r { right: -3.5px; }
 
-  /* ── Inspector Panel ── */
-  .inspector {
-    position: sticky;
-    top: 72px;
-    background: var(--panel);
+  /* ── Right Slide-Over Inspector Drawer (Archify Glass Drawer) ── */
+  .drawer {
+    position: fixed;
+    top: 66px;
+    right: 16px;
+    bottom: 16px;
+    width: 470px;
+    max-width: calc(100vw - 32px);
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    max-height: calc(100vh - 96px);
-    overflow-y: auto;
+    border-radius: 14px;
+    z-index: 180;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.55);
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .insp-title {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--ink);
-    margin-bottom: 4px;
+  .drawer.closed {
+    transform: translateX(500px);
   }
-  .insp-sub {
-    font-size: 12.5px;
-    color: var(--muted);
-    margin-bottom: 14px;
-  }
-  .two-q-box {
-    background: rgba(15, 23, 42, 0.75);
-    border: 1px solid var(--border);
-    border-left: 3.5px solid var(--accent);
-    border-radius: 8px;
-    padding: 12px 14px;
-    margin-bottom: 16px;
-  }
-  .two-q-box .q-row {
-    font-size: 12.8px;
-    margin-bottom: 6px;
-  }
-  .two-q-box .q-row:last-child { margin-bottom: 0; }
-  .two-q-box b { color: var(--accent-2); }
-  .md-body h1, .md-body h2, .md-body h3 {
-    color: var(--ink);
-    margin: 14px 0 6px;
-    font-size: 14.5px;
+  .drawer-head {
+    padding: 16px 18px 12px;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
   }
-  .md-body h1 { display: none; }
-  .md-body p, .md-body li {
-    font-size: 13px;
+  .drawer-body {
+    padding: 14px 18px 24px;
+    overflow-y: auto;
+    flex: 1;
+    user-select: text;
+  }
+  .close-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: var(--body);
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .lineage-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .l-chip {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: rgba(30, 41, 59, 0.7);
+    color: #e2e8f0;
+  }
+  .l-chip.anc { border-color: rgba(16, 185, 129, 0.5); color: #6ee7b7; }
+  .l-chip.desc { border-color: rgba(56, 189, 248, 0.5); color: #7dd3fc; }
+  .l-chip.riv { border-color: rgba(244, 63, 94, 0.5); color: #fda4af; }
+
+  .two-q-card {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--border);
+    border-left: 3.5px solid #38bdf8;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+  }
+  .two-q-card div { margin-bottom: 5px; }
+  .two-q-card div:last-child { margin-bottom: 0; }
+  .two-q-card b { color: #7dd3fc; }
+
+  /* Markdown inside Drawer & Modals */
+  .md-content h1 { display: none; }
+  .md-content h2, .md-content h3 {
+    color: var(--ink);
+    font-size: 13.8px;
+    margin: 13px 0 6px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--border);
+  }
+  .md-content p, .md-content li {
+    font-size: 12.5px;
     color: var(--body);
     margin-bottom: 5px;
+    line-height: 1.55;
   }
-  .md-body ul, .md-body ol { padding-left: 18px; margin-bottom: 8px; }
-  .md-body pre {
-    background: #090d16;
+  .md-content ul, .md-content ol { padding-left: 17px; margin-bottom: 8px; }
+  .md-content pre {
+    background: #05070c;
     border: 1px solid var(--border);
-    padding: 10px 12px;
+    padding: 8px 10px;
     border-radius: 6px;
     overflow-x: auto;
-    font-size: 12px;
+    font-size: 11.5px;
     color: #93c5fd;
-    margin: 8px 0;
+    margin: 7px 0;
   }
-  .md-body blockquote {
-    border-left: 3px solid var(--muted);
-    padding-left: 10px;
-    color: var(--muted);
-    font-size: 12px;
-    margin-bottom: 10px;
+  .md-content blockquote {
+    border-left: 2.5px solid #64748b;
+    padding-left: 9px;
+    color: #94a3b8;
+    font-size: 11.5px;
+    margin-bottom: 8px;
   }
-  .md-body table {
+  .md-content table {
     width: 100%;
     border-collapse: collapse;
-    margin: 10px 0;
-    font-size: 12px;
+    margin: 8px 0;
+    font-size: 11.5px;
   }
-  .md-body th, .md-body td {
+  .md-content th, .md-content td {
     border: 1px solid var(--border);
-    padding: 6px 8px;
+    padding: 5px 7px;
     text-align: left;
   }
-  .md-body th { background: var(--panel-2); color: var(--ink); }
+  .md-content th { background: rgba(30, 41, 59, 0.8); color: var(--ink); }
 
-  /* ── Search Engine View ── */
-  .search-hero {
-    background: var(--panel);
+  /* ── Overlay Panes for Search / Compare / Portfolio ── */
+  .overlay-view {
+    position: fixed;
+    top: 66px;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    background: rgba(9, 13, 22, 0.96);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 22px;
-    margin-bottom: 18px;
+    border-radius: 14px;
+    z-index: 190;
+    padding: 22px 26px;
+    overflow-y: auto;
+    display: none;
+    user-select: text;
   }
-  .search-bar-row {
+  .overlay-view.active { display: block; }
+  .overlay-inner { max-width: 1320px; margin: 0 auto; }
+
+  .search-row {
     display: flex;
     gap: 10px;
     margin: 12px 0;
   }
-  .search-input {
+  .s-input {
     flex: 1;
-    background: #090d16;
+    background: #05070c;
     border: 1px solid var(--border);
     color: var(--ink);
-    padding: 11px 16px;
+    padding: 10px 15px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13.5px;
     outline: none;
   }
-  .search-input:focus { border-color: var(--accent); }
-  .btn-primary {
-    background: var(--accent);
-    color: #fff;
-    border: 0;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: 700;
-    cursor: pointer;
-    font-size: 13.5px;
-  }
-  .btn-secondary {
-    background: var(--panel-2);
-    color: var(--ink);
-    border: 1px solid var(--border);
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 13px;
-  }
-  .hit-card {
-    background: var(--panel);
+  .s-input:focus { border-color: #38bdf8; }
+  .pill-bar { display: flex; flex-wrap: wrap; gap: 7px; margin: 8px 0 16px; }
+  .card-block {
+    background: rgba(17, 24, 39, 0.85);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 16px 20px;
+    padding: 16px 18px;
     margin-bottom: 12px;
   }
-  .hit-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  .hit-score {
-    font-family: Consolas, monospace;
-    font-size: 12px;
-    color: var(--green);
-    background: rgba(16, 185, 129, 0.12);
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-  mark {
-    background: rgba(245, 158, 11, 0.28);
-    color: #fde68a;
-    padding: 0 2px;
-    border-radius: 2px;
-  }
-
-  /* ── Comparator View ── */
-  .comp-controls {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px 20px;
-    margin-bottom: 18px;
-  }
-  .select-row {
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    margin-top: 12px;
-    flex-wrap: wrap;
-  }
-  select.paper-sel {
-    background: #090d16;
-    color: var(--ink);
-    border: 1px solid var(--border);
-    padding: 9px 14px;
-    border-radius: 8px;
-    font-size: 13.5px;
-    min-width: 260px;
-  }
-  .comp-grid {
+  .comp-2col {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 18px;
+    gap: 16px;
   }
-  @media (max-width: 900px) {
-    .comp-grid { grid-template-columns: 1fr; }
-  }
-
-  /* ── Portfolio Showcase View ── */
+  @media (max-width: 900px) { .comp-2col { grid-template-columns: 1fr; } }
   .proj-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(410px, 1fr));
-    gap: 18px;
-  }
-  @media (max-width: 860px) {
-    .proj-grid { grid-template-columns: 1fr; }
+    grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
+    gap: 16px;
   }
   .proj-card {
-    background: var(--panel);
+    background: rgba(17, 24, 39, 0.9);
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
   }
-  .proj-media {
+  .proj-card img {
     width: 100%;
-    height: 220px;
+    height: 215px;
     object-fit: cover;
-    background: #090d16;
     border-bottom: 1px solid var(--border);
-  }
-  .proj-body {
-    padding: 16px 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  .proj-body h3 {
-    font-size: 16px;
-    color: var(--ink);
-    margin-bottom: 6px;
-  }
-  .proj-body p {
-    font-size: 13px;
-    color: var(--body);
-    margin-bottom: 10px;
   }
 </style>
 </head>
 <body>
 
-  <nav class="topbar">
-    <div class="brand">
-      <div class="brand-logo">KB</div>
+  <!-- Top Floating Archify HUD -->
+  <div class="top-hud">
+    <div class="hud-box">
+      <div class="logo-badge">KB</div>
       <div>
-        <h1>Embodied-KB · 具身智能与世界模型交互谱系</h1>
-        <div class="sub">36 篇代表作精读 · 三层认知架构 · 两问定位法 · 实时 BM25 检索 · 实操验证展厅</div>
-      </div>
-    </div>
-    <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('map', this)">1. 交互式谱系与认知架构</button>
-      <button class="tab-btn" onclick="switchTab('search', this)">2. 实时检索与 30 题评测</button>
-      <button class="tab-btn" onclick="switchTab('compare', this)">3. 论文两两对比器</button>
-      <button class="tab-btn" onclick="switchTab('portfolio', this)">4. 实操开源项目展厅</button>
-    </div>
-    <a class="gh-btn" href="https://github.com/yimingjiang216-alt/embodied-kb" target="_blank">
-      ★ GitHub 仓库主页
-    </a>
-  </nav>
-
-  <div class="container">
-
-    <!-- ==================== TAB 1: LINEAGE & COGNITIVE MAP ==================== -->
-    <div id="pane-map" class="view-pane active">
-      <div class="spectrum-box">
-        <div class="spectrum-head">
-          <h2>一、横向功能光谱（点击任意档位筛选论文：越往右物理越刚性、动作接口越底层）</h2>
-          <span>判断任何论文先问两句：① 它预测什么空间？ ② 预测出来给谁用？</span>
-        </div>
-        <div class="spectrum-grid" id="spectrum-grid">
-          <div class="spec-stage" onclick="filterSpectrum(1, this)">
-            <div class="st-num">Stage 1 · 符号/事件/语音</div>
-            <div class="st-name">代码编排与事件规划</div>
-            <div class="st-rep">Argon · X-Planner · X2-Turn</div>
-          </div>
-          <div class="spec-stage" onclick="filterSpectrum(2, this)">
-            <div class="st-num">Stage 2 · 3D几何/离散动作</div>
-            <div class="st-name">3D显式空间与离散Token</div>
-            <div class="st-rep">MCP-3DGS · DP3 · OpenVLA · FAST</div>
-          </div>
-          <div class="spec-stage" onclick="filterSpectrum(3, this)">
-            <div class="st-num">Stage 3 · 中间表征</div>
-            <div class="st-name">子目标图与隐式动作桥</div>
-            <div class="st-rep">π0.5 · π0.7 BAGEL · AgiBot GO-1</div>
-          </div>
-          <div class="spec-stage" onclick="filterSpectrum(4, this)">
-            <div class="st-num">Stage 4 · 像素/潜空间预演</div>
-            <div class="st-name">视频与潜变量世界模型</div>
-            <div class="st-rep">DreamerV3 · Cosmos · DreamZero · VPP2</div>
-          </div>
-          <div class="spec-stage" onclick="filterSpectrum(5, this)">
-            <div class="st-num">Stage 5 · 连续流/可微动力学</div>
-            <div class="st-name">流匹配VLA与物理状态WM</div>
-            <div class="st-rep">π0 · Wall-OSS 1.0 · RDT-1B · SuperMimic</div>
-          </div>
-          <div class="spec-stage" onclick="filterSpectrum(6, this)">
-            <div class="st-num">Stage 6 · 手写物理引擎</div>
-            <div class="st-name">精确刚体与接触仿真</div>
-            <div class="st-rep">Isaac Lab · MuJoCo</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="filter-bar" id="route-filters"></div>
-
-      <div class="split-layout">
-        <div id="layers-container"></div>
-        <div class="inspector" id="paper-inspector"></div>
+        <div class="brand-title">Embodied-KB · 具身智能与世界模型架构图谱</div>
+        <div class="brand-sub">36 篇核心论文拓扑连线 · 点击任意节点追踪「前代源流 / 后代演进 / 路线交锋」</div>
       </div>
     </div>
 
-    <!-- ==================== TAB 2: LIVE BM25 SEARCH & BENCHMARK ==================== -->
-    <div id="pane-search" class="view-pane">
-      <div class="search-hero">
-        <h2 style="color:var(--ink);font-size:17px;">浏览器端实时检索引擎（英文术语 + 中文二元分词 BM25，零延迟带出处返回）</h2>
-        <div class="search-bar-row">
-          <input id="q-input" class="search-input" type="text" placeholder="输入英文术语或中文问题，例如：stop-gradient 和梯度全通有什么区别？" oninput="runLiveSearch()">
-          <button class="btn-primary" onclick="runLiveSearch()">立即检索</button>
-          <button class="btn-secondary" onclick="runBenchmarkUI()">▶ 运行 30 题标准评测集</button>
-        </div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">💡 点击下方高频面试题一键检索：</div>
-        <div class="filter-bar" id="preset-queries" style="margin-bottom:0;"></div>
+    <div class="hud-box mode-tabs">
+      <button class="mode-btn active" onclick="setViewMode('canvas', this)">🗺️ Archify 拓扑谱系画布</button>
+      <button class="mode-btn" onclick="setViewMode('search', this)">🔍 实时 BM25 检索与评测</button>
+      <button class="mode-btn" onclick="setViewMode('compare', this)">⚔️ 论文两两正面对比</button>
+      <button class="mode-btn" onclick="setViewMode('portfolio', this)">🚀 6 大实操开源项目展厅</button>
+    </div>
+
+    <div class="hud-box" style="gap:8px;">
+      <button class="ctrl-btn" onclick="resetCanvasView()">⌖ 自适应居中</button>
+      <button class="ctrl-btn" onclick="zoomCanvas(1.15)">＋ 放大</button>
+      <button class="ctrl-btn" onclick="zoomCanvas(0.87)">－ 缩小</button>
+      <a class="ctrl-btn" style="text-decoration:none;color:#60a5fa;" href="https://github.com/yimingjiang216-alt/embodied-kb" target="_blank">★ GitHub</a>
+    </div>
+  </div>
+
+  <!-- Bottom Floating Legend & Quick Route Highlight HUD -->
+  <div class="bottom-hud" id="bottom-hud">
+    <div class="hud-box" style="gap:14px;">
+      <span class="legend-item"><i class="legend-line" style="background:#10b981;"></i>前代源流 (Ancestors)</span>
+      <span class="legend-item"><i class="legend-line" style="background:#38bdf8;"></i>后代演进 (Descendants)</span>
+      <span class="legend-item"><i class="legend-line" style="background:#f43f5e;"></i>⚡ 路线交锋 (Rivalry)</span>
+    </div>
+    <div class="hud-box" style="gap:6px;flex-wrap:wrap;">
+      <span style="font-size:11.5px;color:#94a3b8;">高亮支线：</span>
+      <button class="ctrl-btn active" onclick="highlightRoute('ALL', this)">全部 (36)</button>
+      <button class="ctrl-btn" onclick="highlightRoute('VLA_FLOW', this)">π 系与流匹配 VLA</button>
+      <button class="ctrl-btn" onclick="highlightRoute('WM_VIDEO', this)">视频世界模型 & WAM</button>
+      <button class="ctrl-btn" onclick="highlightRoute('WM_LATENT', this)">Dreamer 潜空间系</button>
+      <button class="ctrl-btn" onclick="highlightRoute('WBC', this)">人形小脑全身控制</button>
+      <button class="ctrl-btn" onclick="highlightRoute('SPATIAL_3D', this)">3DGS 与三维空间</button>
+      <button class="ctrl-btn" onclick="highlightRoute('BRAIN_VOICE', this)">大脑规划与实时语音</button>
+    </div>
+  </div>
+
+  <!-- Main Archify Interactive Canvas -->
+  <div id="canvas-viewport">
+    <div id="canvas-world">
+      <div id="lanes-layer"></div>
+      <svg id="edges-svg"></svg>
+      <div id="edge-labels-layer"></div>
+      <div id="nodes-layer"></div>
+    </div>
+  </div>
+
+  <!-- Right Slide-over Glass Inspector Drawer -->
+  <aside class="drawer" id="inspector-drawer">
+    <div class="drawer-head">
+      <div>
+        <div id="dr-badge" style="font-size:11px;font-weight:700;color:#38bdf8;margin-bottom:3px;"></div>
+        <div id="dr-title" style="font-size:18px;font-weight:800;color:#f8fafc;"></div>
+        <div id="dr-org" style="font-size:11.5px;color:#94a3b8;margin-top:2px;"></div>
       </div>
+      <button class="close-btn" onclick="toggleDrawer(false)" title="收起面板">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div id="dr-relations" class="lineage-chips"></div>
+      <div id="dr-twoq" class="two-q-card"></div>
+      <div id="dr-md" class="md-content"></div>
+    </div>
+  </aside>
+
+  <!-- Overlay 1: Live BM25 Search & Benchmark -->
+  <div id="ov-search" class="overlay-view">
+    <div class="overlay-inner">
+      <h2 style="color:#f8fafc;font-size:18px;">🔍 实时检索引擎（英文术语 + 中文二元分词 BM25，带出处与行号）</h2>
+      <div class="search-row">
+        <input id="q-input" class="s-input" type="text" placeholder="输入术语或问题，如：stop-gradient 和梯度全通有什么区别？" oninput="runLiveSearch()">
+        <button class="ctrl-btn active" style="padding:8px 16px;font-size:13px;" onclick="runLiveSearch()">立即检索</button>
+        <button class="ctrl-btn" style="padding:8px 16px;font-size:13px;" onclick="runBenchmarkUI()">▶ 运行 15 题标准评测基准</button>
+      </div>
+      <div class="pill-bar" id="preset-queries"></div>
       <div id="search-results"></div>
     </div>
+  </div>
 
-    <!-- ==================== TAB 3: SIDE-BY-SIDE PAPER COMPARATOR ==================== -->
-    <div id="pane-compare" class="view-pane">
-      <div class="comp-controls">
-        <h2 style="color:var(--ink);font-size:17px;">论文两两正面对比器（定位路线分歧与前后代演进）</h2>
-        <div style="font-size:12px;color:var(--muted);margin-top:6px;">点击经典对决组合，或在下拉框任选两篇论文并排比对：</div>
-        <div class="filter-bar" id="preset-pairs" style="margin-top:10px;margin-bottom:8px;"></div>
-        <div class="select-row">
-          <select id="sel-a" class="paper-sel" onchange="renderComparison()"></select>
-          <span style="font-weight:800;color:var(--accent-2);">VS</span>
-          <select id="sel-b" class="paper-sel" onchange="renderComparison()"></select>
-        </div>
+  <!-- Overlay 2: Side-by-Side Comparator -->
+  <div id="ov-compare" class="overlay-view">
+    <div class="overlay-inner">
+      <h2 style="color:#f8fafc;font-size:18px;">⚔️ 论文两两正面对比器（定位核心分歧与前后代演进）</h2>
+      <div class="pill-bar" id="preset-pairs"></div>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+        <select id="sel-a" class="s-input" style="max-width:340px;" onchange="renderComparison()"></select>
+        <span style="font-weight:900;color:#f43f5e;">⚡ VS</span>
+        <select id="sel-b" class="s-input" style="max-width:340px;" onchange="renderComparison()"></select>
       </div>
-      <div class="comp-grid" id="comp-output"></div>
+      <div class="comp-2col" id="comp-output"></div>
     </div>
+  </div>
 
-    <!-- ==================== TAB 4: PORTFOLIO SHOWCASE ==================== -->
-    <div id="pane-portfolio" class="view-pane">
-      <div class="spectrum-box" style="margin-bottom:18px;">
-        <h2 style="color:var(--ink);font-size:17px;margin-bottom:4px;">理论谱系对应的 6 个实操开源验证仓库（GitHub: yimingjiang216-alt）</h2>
-        <div style="font-size:13px;color:var(--muted);">从顶层「3DGS 空间记忆与主动感知（大脑）」→「π0/π0.5 VLA 机械臂部署与鲁棒性评测（运动皮层）」→「Unitree G1 29-DoF 可微物理世界模型（小脑）」的完整实操验证。</div>
-      </div>
+  <!-- Overlay 3: Portfolio Showcase -->
+  <div id="ov-portfolio" class="overlay-view">
+    <div class="overlay-inner">
+      <h2 style="color:#f8fafc;font-size:18px;margin-bottom:4px;">🚀 理论谱系对应的实操开源项目展厅（GitHub: yimingjiang216-alt）</h2>
+      <p style="font-size:13px;color:#94a3b8;margin-bottom:16px;">覆盖「大脑层 3DGS 空间记忆与主动感知」→「运动皮层 π0/π0.5 机械臂部署与鲁棒性评测」→「小脑层 Unitree G1 可微世界模型全身控制」。</p>
       <div class="proj-grid" id="portfolio-grid"></div>
     </div>
-
   </div>
 
 <script src="kb_data.js"></script>
@@ -651,18 +701,416 @@ const DATA = window.KB_DATA || { papers: [] };
 const PAPERS = DATA.papers;
 const PAPER_MAP = Object.fromEntries(PAPERS.map(p => [p.id, p]));
 
-let activeRoute = "ALL";
-let activeSpec = null;
-let selectedPaperId = "walloss";
-
-const LAYERS = [
-  { key: "voice_brain", title: "0. 实时语音与人机交互入口（80ms 帧同步话轮预测）", clock: "时标：80ms 帧级 ｜ 输出：流式文本 + 6 类话轮状态" },
-  { key: "brain", title: "1. 大脑 · 决策、事件规划、目标想象与 3DGS 空间记忆", clock: "时标：秒级 ｜ 输出：事件子目标 / 候选视角 / 3D 目标图 / 代码" },
-  { key: "cortex", title: "2. 运动皮层 · VLA 与生成式模仿学习策略", clock: "时标：10~50Hz 毫秒级 ｜ 输出：未来 k 步连续动作块 (Action Chunk)" },
-  { key: "world_model", title: "3. 世界模型与 WAM 预演层（潜空间 / 像素视频 / 范式修正）", clock: "用途：当梦境练习场 / 当神经数据工厂 / 视频+动作联合生成 / 训练期当老师" },
-  { key: "cerebellum", title: "4. 小脑 · 人形全身运动控制 (WBC) & 物理状态可微世界模型", clock: "时标：50Hz 控制 / 200Hz 物理 ｜ 输出：29-DoF 全身关节设定点与力矩" },
-  { key: "infra", title: "5. 物理仿真器与大规模数据基建", clock: "光谱最右端：GPU 矢量化手写刚体/接触物理 + 数据扩增" }
+/* ── 5 Horizontal Swimlanes Definition ── */
+const SWIMLANES = [
+  { idx: 0, y: 70,  h: 190, color: "#a855f7", name: "Layer 0 · 大脑决策、实时语音话轮与 3D 空间记忆", desc: "秒级任务规划 / 80ms 语音话轮 / 3DGS 开放词汇空间工具链" },
+  { idx: 1, y: 275, h: 210, color: "#3b82f6", name: "Layer 1A · 运动皮层：模仿底座、离散 Token 与跨本体 VLA", desc: "Action Chunking / 256-bin 离散动作 / DCT+BPE 压缩 / 3D 点云策略" },
+  { idx: 2, y: 500, h: 215, color: "#06b6d4", name: "Layer 1B · 运动皮层：流匹配 (Flow Matching) 与双臂扩散 VLA 主线", desc: "VLM + MoT 动作专家 / 128维统一物理槽位 / 全梯度协同训练 / 关键帧记忆" },
+  { idx: 3, y: 730, h: 235, color: "#10b981", name: "Layer 2 · 世界模型与 WAM 预演层（潜空间 / 像素视频 / 范式修正）", desc: "RSSM 梦境强化学习 / 视频扩散生成 / 视频+动作联合 WAM / 未来当老师 FDM" },
+  { idx: 4, y: 980, h: 195, color: "#f59e0b", name: "Layer 3 · 小脑全身运动控制 (WBC) & 物理仿真底座", desc: "29-DoF 人形动态平衡 / 朝向归一化可微世界模型 32步 BPTT / GPU 并行物理仿真" }
 ];
+
+const TIME_COLS = [
+  { x: 50,   w: 380, label: "2018 – 2022 · 潜空间与连续导航奠基" },
+  { x: 450,  w: 380, label: "2023 · 动作分块、扩散策略与 VLA 诞生" },
+  { x: 850,  w: 440, label: "2024 · 开源 VLA、3D 策略与 π0 流匹配爆发" },
+  { x: 1310, w: 460, label: "2025 · 分层推理、百万真机与世界基础模型" },
+  { x: 1790, w: 520, label: "2026 · WAM 融合、全梯度协同与可微物理 WBC" }
+];
+
+/* ── Explicit (x, y) Canvas Coordinates for all 36 Nodes (Zero Overlap) ── */
+const NODE_POS = {
+  // Lane 0: Brain, Voice & 3D Spatial (y: 70..260)
+  "vlnce":           { x: 240,  y: 115, lane: 0 },
+  "vln-survey":      { x: 870,  y: 105, lane: 0 },
+  "navid":           { x: 870,  y: 185, lane: 0 },
+  "dp3-3dvla":       { x: 1085, y: 115, lane: 0 },
+  "pistar06":        { x: 1540, y: 115, lane: 0 },
+  "pi07":            { x: 1805, y: 105, lane: 0 },
+  "gemini4-argon":   { x: 1805, y: 185, lane: 0 },
+  "xplanner-x2turn": { x: 2010, y: 105, lane: 0 },
+  "mcp-3dgs":        { x: 2010, y: 185, lane: 0 },
+
+  // Lane 1: Imitation & Discrete/Latent-Bridge VLA (y: 275..485)
+  "act":             { x: 470,  y: 315, lane: 1 },
+  "rt2-octo":        { x: 665,  y: 315, lane: 1 },
+  "openvla":         { x: 870,  y: 315, lane: 1 },
+  "fast":            { x: 1325, y: 315, lane: 1 },
+  "agibot-go1":      { x: 1540, y: 315, lane: 1 },
+  "lingbot":         { x: 1900, y: 315, lane: 1 },
+
+  // Lane 2: Flow / Diffusion Continuous VLA (y: 500..715)
+  "diffusion-policy":{ x: 470,  y: 555, lane: 2 },
+  "rdt1b":           { x: 1085, y: 530, lane: 2 },
+  "pi0":             { x: 1085, y: 615, lane: 2 },
+  "gr00t":           { x: 1325, y: 530, lane: 2 },
+  "pi05":            { x: 1325, y: 615, lane: 2 },
+  "walloss":         { x: 1805, y: 575, lane: 2 },
+
+  // Lane 3: World Models & WAM (y: 730..965)
+  "worldmodels":     { x: 60,   y: 775, lane: 3 },
+  "planet":          { x: 245,  y: 775, lane: 3 },
+  "dreamer":         { x: 245,  y: 865, lane: 3 },
+  "dreamerv3":       { x: 470,  y: 775, lane: 3 },
+  "unipi":           { x: 470,  y: 865, lane: 3 },
+  "genie":           { x: 870,  y: 820, lane: 3 },
+  "cosmos":          { x: 1325, y: 775, lane: 3 },
+  "dreamgen":        { x: 1325, y: 865, lane: 3 },
+  "vjepa2":          { x: 1540, y: 775, lane: 3 },
+  "dreamzero":       { x: 1805, y: 775, lane: 3 },
+  "vpp2":            { x: 1805, y: 865, lane: 3 },
+  "fdm":             { x: 2010, y: 820, lane: 3 },
+
+  // Lane 4: Cerebellum WBC & Sim Infra (y: 980..1175)
+  "isaaclab":        { x: 1325, y: 1035, lane: 4 },
+  "beyondmimic":     { x: 1540, y: 1035, lane: 4 },
+  "supermimic":      { x: 1900, y: 1035, lane: 4 }
+};
+
+/* ── Topological Lineage & Rivalry Edges ── */
+const EDGES = [
+  // World Model Latent Line
+  { from: "worldmodels", to: "planet", label: "VAE+RNN → RSSM" },
+  { from: "planet", to: "dreamer", label: "CEM搜索 → 想象Actor-Critic" },
+  { from: "dreamer", to: "dreamerv3", label: "32×32离散潜变量+symlog" },
+  { from: "dreamerv3", to: "vjepa2", label: "潜空间预测范式" },
+  { from: "dreamerv3", to: "supermimic", label: "想象展开BPTT思想" },
+
+  // Video WM & WAM Line
+  { from: "unipi", to: "cosmos", label: "视频扩散基础化" },
+  { from: "cosmos", to: "dreamgen", label: "生成神经合成轨迹" },
+  { from: "dreamgen", to: "gr00t", label: "10×合成数据扩增" },
+  { from: "cosmos", to: "dreamzero", label: "视频+动作联合WAM" },
+  { from: "dreamzero", to: "vpp2", label: "动作专家读视频KV" },
+  { from: "vpp2", to: "fdm", label: "未来预测改在训练期当老师" },
+  { from: "genie", to: "agibot-go1", label: "无监督帧间潜动作Token" },
+  { from: "genie", to: "gr00t", label: "视频潜动作预训练" },
+
+  // Imitation -> VLA Line
+  { from: "act", to: "pi0", label: "Action Chunking 动作块" },
+  { from: "diffusion-policy", to: "pi0", label: "去噪 → Flow Matching" },
+  { from: "diffusion-policy", to: "rdt1b", label: "扩展至1.2B双臂DiT" },
+  { from: "diffusion-policy", to: "dp3-3dvla", label: "2D图像 → 3D点云扩散" },
+  { from: "rt2-octo", to: "openvla", label: "256-bin 开源7B标杆" },
+  { from: "rt2-octo", to: "pi0", label: "VLM语义主干+连续扩散头" },
+  { from: "openvla", to: "fast", label: "DCT+BPE 解决高频自回归复读" },
+  { from: "pi0", to: "fast", label: "离散+连续并行KI" },
+  { from: "pi0", to: "pi05", label: "+子任务文本分层推理" },
+  { from: "fast", to: "pi05", label: "预训练快速Token化" },
+  { from: "pi05", to: "pistar06", label: "+Recap RL 经验自改进" },
+  { from: "pistar06", to: "pi07", label: "+五件套提示与BAGEL目标图" },
+  { from: "agibot-go1", to: "walloss", label: "离散桥+连续流协同" },
+  { from: "walloss", to: "lingbot", label: "+双查询未来蒸馏" },
+  { from: "walloss", to: "xplanner-x2turn", label: "自变量全栈：大脑+语音+VLA" },
+
+  // Navigation & 3D Spatial Line
+  { from: "vlnce", to: "vln-survey", label: "连续3D导航基准" },
+  { from: "vln-survey", to: "navid", label: "单目视频VLM导航" },
+  { from: "navid", to: "mcp-3dgs", label: "主动候选视角想象NBV" },
+  { from: "dp3-3dvla", to: "mcp-3dgs", label: "显式3D几何 → 语义3DGS工具链" },
+  { from: "gemini4-argon", to: "mcp-3dgs", label: "LLM工具调用 → FastMCP空间服务" },
+
+  // Cerebellum WBC Line
+  { from: "isaaclab", to: "beyondmimic", label: "G1并行物理与执行器建模" },
+  { from: "beyondmimic", to: "supermimic", label: "继承G1解析PD与14刚体奖励" },
+
+  // Rivalry / Debate Edges (type: "rivalry")
+  { from: "pi05", to: "walloss", label: "⚡ Stop-Gradient隔离 vs 全梯度协同 (+25%)", type: "rivalry" },
+  { from: "openvla", to: "pi0", label: "⚡ 256-bin离散Token vs 连续Flow Matching", type: "rivalry" },
+  { from: "act", to: "diffusion-policy", label: "⚡ CVAE单步前向 vs 多步迭代去噪", type: "rivalry" },
+  { from: "dreamzero", to: "vjepa2", label: "⚡ 像素级生成 vs LeCun抽象特征预测", type: "rivalry" },
+  { from: "beyondmimic", to: "supermimic", label: "⚡ 百卡无模型PPO vs 单卡可微WM 32步BPTT", type: "rivalry" }
+];
+
+/* ── Canvas Pan & Zoom State ── */
+let panX = 0, panY = 0, scale = 0.62;
+let isDragging = false, startX = 0, startY = 0;
+let activeNodeId = "walloss";
+
+const viewport = document.getElementById("canvas-viewport");
+const world = document.getElementById("canvas-world");
+
+function applyTransform() {
+  world.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+}
+
+function resetCanvasView() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const drawerOpen = !document.getElementById("inspector-drawer").classList.contains("closed");
+  const availW = drawerOpen && vw > 1000 ? vw - 480 : vw;
+  scale = Math.min(Math.max(availW / 2420, 0.44), 0.85);
+  panX = Math.max((availW - 2360 * scale) / 2, 12);
+  panY = Math.max((vh - 1220 * scale) / 2 + 14, 52);
+  applyTransform();
+}
+
+function zoomCanvas(factor) {
+  const vw = window.innerWidth / 2;
+  const vh = window.innerHeight / 2;
+  const newScale = Math.min(Math.max(scale * factor, 0.35), 1.65);
+  panX = vw - (vw - panX) * (newScale / scale);
+  panY = vh - (vh - panY) * (newScale / scale);
+  scale = newScale;
+  applyTransform();
+}
+
+viewport.addEventListener("mousedown", (e) => {
+  if (e.target.closest(".arch-node")) return;
+  isDragging = true;
+  startX = e.clientX - panX;
+  startY = e.clientY - panY;
+  viewport.classList.add("dragging");
+});
+window.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
+  panX = e.clientX - startX;
+  panY = e.clientY - startY;
+  applyTransform();
+});
+window.addEventListener("mouseup", () => {
+  isDragging = false;
+  viewport.classList.remove("dragging");
+});
+viewport.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.09 : 0.92;
+  const mx = e.clientX;
+  const my = e.clientY;
+  const newScale = Math.min(Math.max(scale * factor, 0.35), 1.65);
+  panX = mx - (mx - panX) * (newScale / scale);
+  panY = my - (my - panY) * (newScale / scale);
+  scale = newScale;
+  applyTransform();
+}, { passive: false });
+
+/* ── Build Archify Canvas Elements ── */
+function initCanvas() {
+  // 1. Swimlanes & Time Headers
+  let lanesHtml = TIME_COLS.map(tc =>
+    `<div class="time-col-header" style="left:${tc.x}px;width:${tc.w}px;">${tc.label}</div>`
+  ).join("");
+
+  lanesHtml += SWIMLANES.map(ln => `
+    <div class="swimlane" style="top:${ln.y}px;height:${ln.h}px;">
+      <div class="lane-tag">
+        <span class="lane-dot" style="background:${ln.color};box-shadow:0 0 8px ${ln.color};"></span>
+        <span class="lane-name">${ln.name}</span>
+        <span class="lane-desc">${ln.desc}</span>
+      </div>
+    </div>
+  `).join("");
+  document.getElementById("lanes-layer").innerHTML = lanesHtml;
+
+  // 2. Nodes
+  const nodesLayer = document.getElementById("nodes-layer");
+  nodesLayer.innerHTML = PAPERS.map(p => {
+    const pos = NODE_POS[p.id] || { x: 100, y: 100, lane: 1 };
+    const ln = SWIMLANES[pos.lane] || SWIMLANES[1];
+    return `
+      <div class="arch-node" id="node-${p.id}" style="left:${pos.x}px;top:${pos.y}px;"
+           onclick="selectNode('${p.id}')" onmouseenter="hoverNode('${p.id}')" onmouseleave="unhoverNode()">
+        <span class="port-l"></span>
+        <span class="port-r"></span>
+        <div class="n-head">
+          <span class="n-title">${escapeHtml(p.title)}</span>
+          <span class="n-tag" style="background:${ln.color}22;color:${ln.color};border:1px solid ${ln.color}55;">${escapeHtml(p.route)}</span>
+        </div>
+        <div class="n-sub">${escapeHtml(p.year)} · ${escapeHtml(p.org.split('(')[0].trim())}</div>
+        <div class="n-hooks">${escapeHtml(p.q2)}</div>
+      </div>
+    `;
+  }).join("");
+
+  // 3. SVG Bezier Edges & Edge Labels
+  const svg = document.getElementById("edges-svg");
+  const lblLayer = document.getElementById("edge-labels-layer");
+  let svgHtml = "";
+  let lblHtml = "";
+  const NODE_W = 178, NODE_H = 68;
+
+  EDGES.forEach((ed, idx) => {
+    const p1 = NODE_POS[ed.from];
+    const p2 = NODE_POS[ed.to];
+    if (!p1 || !p2) return;
+    const x1 = p1.x + NODE_W;
+    const y1 = p1.y + NODE_H / 2;
+    const x2 = p2.x;
+    const y2 = p2.y + NODE_H / 2;
+    const dx = Math.max(Math.abs(x2 - x1) * 0.5, 45);
+    const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+    const cls = ed.type === "rivalry" ? "edge-path rivalry" : "edge-path";
+    svgHtml += `<path id="edge-${idx}" class="${cls}" d="${d}" />`;
+
+    const mx = (x1 + x2) / 2;
+    const my = (y1 + y2) / 2;
+    const lCls = ed.type === "rivalry" ? "edge-label rival-lbl" : "edge-label";
+    lblHtml += `<div id="elbl-${idx}" class="${lCls}" style="left:${mx}px;top:${my}px;">${escapeHtml(ed.label)}</div>`;
+  });
+
+  svg.innerHTML = svgHtml;
+  lblLayer.innerHTML = lblHtml;
+}
+
+/* ── Lineage Graph Traversal (Ancestors, Descendants, Rivals) ── */
+function getLineageSet(rootId) {
+  const ancestors = new Set();
+  const descendants = new Set();
+  const rivals = new Set();
+  const ancEdges = new Set();
+  const descEdges = new Set();
+  const rivalEdges = new Set();
+
+  // Direct rivals
+  EDGES.forEach((ed, idx) => {
+    if (ed.type === "rivalry") {
+      if (ed.from === rootId) { rivals.add(ed.to); rivalEdges.add(idx); }
+      if (ed.to === rootId) { rivals.add(ed.from); rivalEdges.add(idx); }
+    }
+  });
+
+  // Upstream BFS (Ancestors)
+  let qUp = [rootId];
+  while (qUp.length > 0) {
+    const curr = qUp.shift();
+    EDGES.forEach((ed, idx) => {
+      if (ed.type !== "rivalry" && ed.to === curr) {
+        ancEdges.add(idx);
+        if (!ancestors.has(ed.from) && ed.from !== rootId) {
+          ancestors.add(ed.from);
+          qUp.push(ed.from);
+        }
+      }
+    });
+  }
+
+  // Downstream BFS (Descendants)
+  let qDown = [rootId];
+  while (qDown.length > 0) {
+    const curr = qDown.shift();
+    EDGES.forEach((ed, idx) => {
+      if (ed.type !== "rivalry" && ed.from === curr) {
+        descEdges.add(idx);
+        if (!descendants.has(ed.to) && ed.to !== rootId) {
+          descendants.add(ed.to);
+          qDown.push(ed.to);
+        }
+      }
+    });
+  }
+
+  return { ancestors, descendants, rivals, ancEdges, descEdges, rivalEdges };
+}
+
+function applyHighlight(focusId) {
+  if (!focusId) {
+    document.querySelectorAll(".arch-node").forEach(el => {
+      el.classList.remove("dimmed", "active", "anc-node", "desc-node", "rival-node");
+      if (el.id === "node-" + activeNodeId) el.classList.add("active");
+    });
+    document.querySelectorAll(".edge-path").forEach(el => {
+      el.classList.remove("dimmed", "hi-anc", "hi-desc", "hi-rival");
+    });
+    document.querySelectorAll(".edge-label").forEach(el => el.classList.remove("show"));
+    return;
+  }
+
+  const { ancestors, descendants, rivals, ancEdges, descEdges, rivalEdges } = getLineageSet(focusId);
+
+  PAPERS.forEach(p => {
+    const el = document.getElementById("node-" + p.id);
+    if (!el) return;
+    el.classList.remove("dimmed", "active", "anc-node", "desc-node", "rival-node");
+    if (p.id === focusId) el.classList.add("active");
+    else if (rivals.has(p.id)) el.classList.add("rival-node");
+    else if (ancestors.has(p.id)) el.classList.add("anc-node");
+    else if (descendants.has(p.id)) el.classList.add("desc-node");
+    else el.classList.add("dimmed");
+  });
+
+  EDGES.forEach((ed, idx) => {
+    const pathEl = document.getElementById("edge-" + idx);
+    const lblEl = document.getElementById("elbl-" + idx);
+    if (!pathEl) return;
+    pathEl.classList.remove("dimmed", "hi-anc", "hi-desc", "hi-rival");
+    lblEl.classList.remove("show");
+
+    if (rivalEdges.has(idx)) {
+      pathEl.classList.add("hi-rival");
+      lblEl.classList.add("show");
+    } else if (ancEdges.has(idx)) {
+      pathEl.classList.add("hi-anc");
+      if (ed.to === focusId || ed.from === focusId) lblEl.classList.add("show");
+    } else if (descEdges.has(idx)) {
+      pathEl.classList.add("hi-desc");
+      if (ed.from === focusId || ed.to === focusId) lblEl.classList.add("show");
+    } else {
+      pathEl.classList.add("dimmed");
+    }
+  });
+}
+
+function selectNode(pid) {
+  activeNodeId = pid;
+  toggleDrawer(true);
+  applyHighlight(pid);
+  updateDrawer(pid);
+}
+
+function hoverNode(pid) {
+  applyHighlight(pid);
+}
+
+function unhoverNode() {
+  applyHighlight(activeNodeId);
+}
+
+function toggleDrawer(open) {
+  const dr = document.getElementById("inspector-drawer");
+  if (open) dr.classList.remove("closed");
+  else {
+    dr.classList.add("closed");
+    applyHighlight(null);
+  }
+}
+
+function highlightRoute(groupKey, btn) {
+  document.querySelectorAll("#bottom-hud .ctrl-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  if (groupKey === "ALL") {
+    applyHighlight(null);
+    return;
+  }
+  const matchSet = new Set(PAPERS.filter(p => {
+    if (groupKey === "VLA_FLOW") return ["pi0", "pi05", "pistar06", "pi07", "walloss", "rdt1b", "gr00t", "lingbot", "agibot-go1", "fast", "openvla", "rt2-octo", "act", "diffusion-policy"].includes(p.id);
+    if (groupKey === "WM_VIDEO") return ["unipi", "cosmos", "dreamgen", "dreamzero", "vpp2", "fdm", "genie", "vjepa2"].includes(p.id);
+    if (groupKey === "WM_LATENT") return ["worldmodels", "planet", "dreamer", "dreamerv3"].includes(p.id);
+    if (groupKey === "WBC") return ["isaaclab", "beyondmimic", "supermimic"].includes(p.id);
+    if (groupKey === "SPATIAL_3D") return ["vlnce", "vln-survey", "navid", "dp3-3dvla", "mcp-3dgs"].includes(p.id);
+    if (groupKey === "BRAIN_VOICE") return ["xplanner-x2turn", "gemini4-argon", "pi07", "mcp-3dgs"].includes(p.id);
+    return true;
+  }).map(p => p.id));
+
+  PAPERS.forEach(p => {
+    const el = document.getElementById("node-" + p.id);
+    if (!el) return;
+    el.classList.remove("dimmed", "active", "anc-node", "desc-node", "rival-node");
+    if (matchSet.has(p.id)) el.classList.add("desc-node");
+    else el.classList.add("dimmed");
+  });
+  EDGES.forEach((ed, idx) => {
+    const pathEl = document.getElementById("edge-" + idx);
+    const lblEl = document.getElementById("elbl-" + idx);
+    pathEl.classList.remove("dimmed", "hi-anc", "hi-desc", "hi-rival");
+    lblEl.classList.remove("show");
+    if (matchSet.has(ed.from) && matchSet.has(ed.to)) {
+      pathEl.classList.add(ed.type === "rivalry" ? "hi-rival" : "hi-desc");
+      lblEl.classList.add("show");
+    } else {
+      pathEl.classList.add("dimmed");
+    }
+  });
+}
 
 function escapeHtml(s) {
   return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -670,33 +1118,23 @@ function escapeHtml(s) {
 
 function renderMarkdown(md) {
   const lines = String(md || "").split("\n");
-  let html = "";
-  let inPre = false;
-  let inTable = false;
-  let inList = false;
-
+  let html = "", inPre = false, inTable = false, inList = false;
   const inlineFmt = (str) => {
     let s = escapeHtml(str);
     s = s.replace(/\*\*(.+?)\*\*/g, "<b style='color:#f8fafc'>$1</b>");
-    s = s.replace(/`([^`]+)`/g, "<code style='background:#1e293b;color:#93c5fd;padding:1px 5px;border-radius:4px;font-family:Consolas,monospace;font-size:12px;'>$1</code>");
+    s = s.replace(/`([^`]+)`/g, "<code style='background:#1e293b;color:#93c5fd;padding:1px 5px;border-radius:4px;font-family:Consolas,monospace;font-size:11.5px;'>$1</code>");
     s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, "<a href='$2' target='_blank'>$1</a>");
     return s;
   };
-
   for (let i = 0; i < lines.length; i++) {
-    const raw = lines[i];
-    const line = raw.trim();
+    const raw = lines[i], line = raw.trim();
     if (line.startsWith("```")) {
       if (inList) { html += "</ul>"; inList = false; }
       if (inTable) { html += "</tbody></table>"; inTable = false; }
-      if (!inPre) { html += "<pre>"; inPre = true; }
-      else { html += "</pre>"; inPre = false; }
+      if (!inPre) { html += "<pre>"; inPre = true; } else { html += "</pre>"; inPre = false; }
       continue;
     }
-    if (inPre) {
-      html += escapeHtml(raw) + "\n";
-      continue;
-    }
+    if (inPre) { html += escapeHtml(raw) + "\n"; continue; }
     if (line.startsWith("|") && line.endsWith("|")) {
       if (inList) { html += "</ul>"; inList = false; }
       const cells = line.slice(1, -1).split("|").map(c => c.trim());
@@ -708,29 +1146,18 @@ function renderMarkdown(md) {
         html += "<tr>" + cells.map(c => `<td>${inlineFmt(c)}</td>`).join("") + "</tr>";
       }
       continue;
-    } else if (inTable) {
-      html += "</tbody></table>";
-      inTable = false;
-    }
+    } else if (inTable) { html += "</tbody></table>"; inTable = false; }
 
-    if (line.startsWith("# ")) {
-      if (inList) { html += "</ul>"; inList = false; }
-      html += `<h1>${inlineFmt(line.slice(2))}</h1>`;
-    } else if (line.startsWith("## ")) {
-      if (inList) { html += "</ul>"; inList = false; }
-      html += `<h2>${inlineFmt(line.slice(3))}</h2>`;
-    } else if (line.startsWith("### ")) {
-      if (inList) { html += "</ul>"; inList = false; }
-      html += `<h3>${inlineFmt(line.slice(4))}</h3>`;
-    } else if (line.startsWith("> ")) {
-      if (inList) { html += "</ul>"; inList = false; }
-      html += `<blockquote>${inlineFmt(line.slice(2))}</blockquote>`;
-    } else if (/^(\-|\d+\.)\s+/.test(line)) {
+    if (line.startsWith("# ")) continue;
+    else if (line.startsWith("## ")) { if (inList) { html += "</ul>"; inList = false; } html += `<h2>${inlineFmt(line.slice(3))}</h2>`; }
+    else if (line.startsWith("### ")) { if (inList) { html += "</ul>"; inList = false; } html += `<h3>${inlineFmt(line.slice(4))}</h3>`; }
+    else if (line.startsWith("> ")) { if (inList) { html += "</ul>"; inList = false; } html += `<blockquote>${inlineFmt(line.slice(2))}</blockquote>`; }
+    else if (/^(\-|\d+\.)\s+/.test(line)) {
       if (!inList) { html += "<ul>"; inList = true; }
       html += `<li>${inlineFmt(line.replace(/^(\-|\d+\.)\s+/, ""))}</li>`;
     } else if (line === "---") {
       if (inList) { html += "</ul>"; inList = false; }
-      html += "<hr style='border:0;border-top:1px solid var(--border);margin:10px 0;'>";
+      html += "<hr style='border:0;border-top:1px solid var(--border);margin:8px 0;'>";
     } else if (line.length > 0) {
       if (inList) { html += "</ul>"; inList = false; }
       html += `<p>${inlineFmt(line)}</p>`;
@@ -742,101 +1169,44 @@ function renderMarkdown(md) {
   return html;
 }
 
-function initRouteFilters() {
-  const routes = ["ALL", "VLA", "模仿底座", "3D-VLA & 3DGS", "大脑-语音 & LLM", "WM-latent", "WM-视频 & WAM", "WBC-小脑 & 状态WM", "VLN", "仿真 & 范式修正"];
-  const bar = document.getElementById("route-filters");
-  bar.innerHTML = `<span style="font-size:12px;color:var(--muted);">按技术支线筛选：</span>` + routes.map(r => {
-    const label = r === "ALL" ? `全部 (${PAPERS.length} 篇)` : r;
-    const cls = r === activeRoute ? "pill-btn active" : "pill-btn";
-    return `<button class="${cls}" onclick="setRouteFilter('${r}')">${label}</button>`;
-  }).join("");
-}
+function updateDrawer(pid) {
+  const p = PAPER_MAP[pid] || PAPERS[0];
+  document.getElementById("dr-badge").textContent = `${p.route} · 光谱第 ${p.spec} 档 · ${p.year}`;
+  document.getElementById("dr-title").textContent = p.title;
+  document.getElementById("dr-org").textContent = p.org;
 
-function matchRouteGroup(paper, group) {
-  if (group === "ALL") return true;
-  if (group === "3D-VLA & 3DGS") return ["3D-VLA", "3DGS-空间"].includes(paper.route);
-  if (group === "大脑-语音 & LLM") return ["大脑-语音", "LLM路线"].includes(paper.route);
-  if (group === "WM-视频 & WAM") return ["WM-视频", "WM-平台", "WM-数据工厂", "WM-交互", "WAM", "WM-JEPA"].includes(paper.route);
-  if (group === "WBC-小脑 & 状态WM") return ["WBC-小脑", "WM-状态"].includes(paper.route);
-  if (group === "仿真 & 范式修正") return ["仿真", "范式修正"].includes(paper.route);
-  if (group === "VLA") return ["VLA", "VLA-工具", "VLA+RL"].includes(paper.route);
-  return paper.route === group;
-}
+  const { ancestors, descendants, rivals } = getLineageSet(pid);
+  let chips = "";
+  ancestors.forEach(id => {
+    if (PAPER_MAP[id]) chips += `<span class="l-chip anc" onclick="selectNode('${id}')">← 前代: ${escapeHtml(PAPER_MAP[id].title)}</span>`;
+  });
+  descendants.forEach(id => {
+    if (PAPER_MAP[id]) chips += `<span class="l-chip desc" onclick="selectNode('${id}')">→ 演进: ${escapeHtml(PAPER_MAP[id].title)}</span>`;
+  });
+  rivals.forEach(id => {
+    if (PAPER_MAP[id]) chips += `<span class="l-chip riv" onclick="selectNode('${id}')">⚡ 交锋: ${escapeHtml(PAPER_MAP[id].title)}</span>`;
+  });
+  document.getElementById("dr-relations").innerHTML = chips;
 
-function setRouteFilter(r) {
-  activeRoute = r;
-  activeSpec = null;
-  document.querySelectorAll(".spec-stage").forEach(el => el.classList.remove("active"));
-  initRouteFilters();
-  renderMap();
-}
-
-function filterSpectrum(stageNum, el) {
-  if (activeSpec === stageNum) {
-    activeSpec = null;
-    el.classList.remove("active");
-  } else {
-    activeSpec = stageNum;
-    document.querySelectorAll(".spec-stage").forEach(x => x.classList.remove("active"));
-    el.classList.add("active");
-  }
-  renderMap();
-}
-
-function renderMap() {
-  const container = document.getElementById("layers-container");
-  let html = "";
-  for (const layer of LAYERS) {
-    const items = PAPERS.filter(p => p.layer === layer.key && matchRouteGroup(p, activeRoute) && (!activeSpec || p.spec === activeSpec));
-    if (items.length === 0) continue;
-    html += `<div class="layer-card">
-      <div class="layer-head">
-        <h3>${layer.title} (${items.length})</h3>
-        <span class="clock">${layer.clock}</span>
-      </div>
-      <div class="paper-grid">
-        ${items.map(p => `
-          <div class="paper-node ${p.id === selectedPaperId ? 'selected' : ''}" onclick="selectPaper('${p.id}')">
-            <div class="p-top">
-              <span class="p-title">${escapeHtml(p.title)}</span>
-              <span class="p-badge">${escapeHtml(p.route)}</span>
-            </div>
-            <div class="p-meta">${escapeHtml(p.year)} · ${escapeHtml(p.org.split('(')[0].trim())}</div>
-            <div class="p-desc">${escapeHtml(p.q2)}</div>
-          </div>
-        `).join("")}
-      </div>
-    </div>`;
-  }
-  container.innerHTML = html || `<div class="layer-card">当前筛选条件下暂无条目，请点击「全部」重置。</div>`;
-  renderInspector();
-}
-
-function selectPaper(pid) {
-  selectedPaperId = pid;
-  renderMap();
-}
-
-function renderInspector() {
-  const p = PAPER_MAP[selectedPaperId] || PAPERS[0];
-  if (!p) return;
-  const box = document.getElementById("paper-inspector");
-  box.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-      <span class="p-badge" style="font-size:12px;padding:2px 9px;">${escapeHtml(p.route)} · 光谱第 ${p.spec} 档</span>
-      <span style="font-size:12px;color:var(--muted);">${escapeHtml(p.year)}</span>
-    </div>
-    <div class="insp-title" style="margin-top:6px;">${escapeHtml(p.title)}</div>
-    <div class="insp-sub">${escapeHtml(p.org)}</div>
-    <div class="two-q-box">
-      <div class="q-row"><b>① 预测什么空间：</b>${escapeHtml(p.q1)}</div>
-      <div class="q-row"><b>② 预测出来给谁用：</b>${escapeHtml(p.q2)}</div>
-    </div>
-    <div class="md-body">${renderMarkdown(p.body)}</div>
+  document.getElementById("dr-twoq").innerHTML = `
+    <div><b>① 预测什么空间：</b>${escapeHtml(p.q1)}</div>
+    <div><b>② 预测出来给谁用：</b>${escapeHtml(p.q2)}</div>
   `;
+  document.getElementById("dr-md").innerHTML = renderMarkdown(p.body);
 }
 
-/* ── Client-Side BM25 + Bigram Search ── */
+/* ── View Mode Switcher ── */
+function setViewMode(mode, btn) {
+  document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".overlay-view").forEach(ov => ov.classList.remove("active"));
+  document.getElementById("bottom-hud").style.display = mode === "canvas" ? "flex" : "none";
+  if (mode !== "canvas") {
+    document.getElementById("ov-" + mode).classList.add("active");
+  }
+}
+
+/* ── Search & Comparator Logic ── */
 function tokenize(text) {
   const s = String(text || "").toLowerCase();
   const en = s.match(/[a-zα-ωπ0-9][a-zα-ωπ0-9_.\-]*/g) || [];
@@ -850,34 +1220,22 @@ function tokenize(text) {
   }
   return toks;
 }
-
 const DOC_TOKENS = PAPERS.map(p => tokenize(p.title + " " + p.route + " " + p.org + " " + p.q1 + " " + p.q2 + " " + p.body));
 const AVG_DL = DOC_TOKENS.reduce((acc, d) => acc + d.length, 0) / Math.max(DOC_TOKENS.length, 1);
 const DF = {};
 const TF = DOC_TOKENS.map(d => {
-  const counts = {};
-  const seen = new Set();
-  for (const w of d) {
-    counts[w] = (counts[w] || 0) + 1;
-    seen.add(w);
-  }
+  const counts = {}, seen = new Set();
+  for (const w of d) { counts[w] = (counts[w] || 0) + 1; seen.add(w); }
   for (const w of seen) DF[w] = (DF[w] || 0) + 1;
   return counts;
 });
-
-function bm25Search(query, k = 8) {
-  const qToks = tokenize(query);
-  const N = PAPERS.length;
-  const k1 = 1.5, b = 0.75;
+function bm25Search(query, k = 6) {
+  const qToks = tokenize(query), N = PAPERS.length, k1 = 1.5, b = 0.75;
   const scores = PAPERS.map((p, idx) => {
-    let s = 0;
-    const tf = TF[idx];
-    const dl = DOC_TOKENS[idx].length;
+    let s = 0; const tf = TF[idx], dl = DOC_TOKENS[idx].length;
     for (const w of qToks) {
-      const f = tf[w] || 0;
-      if (!f) continue;
-      const df = DF[w] || 0;
-      const idf = Math.log((N - df + 0.5) / (df + 0.5) + 1.0);
+      const f = tf[w] || 0; if (!f) continue;
+      const idf = Math.log((N - (DF[w] || 0) + 0.5) / ((DF[w] || 0) + 0.5) + 1.0);
       s += idf * (f * (k1 + 1)) / (f + k1 * (1 - b + b * dl / AVG_DL));
     }
     return { paper: p, score: s };
@@ -894,56 +1252,97 @@ const PRESET_QUERIES = [
   "DP3 三维点云 视角不变性 MCP-3DGS",
   "RDT-1B 128维统一物理动作空间 双臂",
   "X2-Turn 实时语音 80ms 话轮预测 backchannel 附和",
-  "未来只当老师 FDM LingBot 双查询蒸馏",
-  "DreamZero 闭环 KV cache 视频世界模型 7Hz",
-  "AgiBot GO-1 ViLLA 隐式动作规划 Latent Planner"
+  "未来只当老师 FDM LingBot 双查询蒸馏"
 ];
 
-function initSearchTab() {
-  const box = document.getElementById("preset-queries");
-  box.innerHTML = PRESET_QUERIES.map(q =>
-    `<button class="pill-btn" onclick="setQuery('${q}')">${q}</button>`
+function initOverlays() {
+  document.getElementById("preset-queries").innerHTML = PRESET_QUERIES.map(q =>
+    `<button class="ctrl-btn" onclick="document.getElementById('q-input').value='${q}';runLiveSearch();">${q}</button>`
   ).join("");
-  setQuery(PRESET_QUERIES[0]);
-}
-
-function setQuery(q) {
-  document.getElementById("q-input").value = q;
+  document.getElementById("q-input").value = PRESET_QUERIES[0];
   runLiveSearch();
+
+  const RIVAL_PAIRS = [
+    ["walloss", "pi05", "⚡ Wall-OSS 1.0 vs π0.5"],
+    ["act", "diffusion-policy", "⚡ ACT vs Diffusion Policy"],
+    ["openvla", "pi0", "⚡ OpenVLA vs π0"],
+    ["supermimic", "beyondmimic", "⚡ SuperMimic vs BeyondMimic"],
+    ["dreamzero", "vjepa2", "⚡ DreamZero vs V-JEPA 2"],
+    ["dp3-3dvla", "mcp-3dgs", "⚡ DP3/3D-VLA vs MCP-3DGS"]
+  ];
+  document.getElementById("preset-pairs").innerHTML = RIVAL_PAIRS.map(([a, b, lbl]) =>
+    `<button class="ctrl-btn" onclick="document.getElementById('sel-a').value='${a}';document.getElementById('sel-b').value='${b}';renderComparison();">${lbl}</button>`
+  ).join("");
+  const opts = PAPERS.map(p => `<option value="${p.id}">${escapeHtml(p.title)} (${escapeHtml(p.year)})</option>`).join("");
+  document.getElementById("sel-a").innerHTML = opts;
+  document.getElementById("sel-b").innerHTML = opts;
+  document.getElementById("sel-a").value = "walloss";
+  document.getElementById("sel-b").value = "pi05";
+  renderComparison();
+
+  const PROJECTS = [
+    {
+      title: "1. supermimic-g1-sim · Unitree G1 全身控制与可微物理世界模型",
+      badge: "小脑全身控制 · MuJoCo 200Hz 闭环",
+      gif: "https://raw.githubusercontent.com/yimingjiang216-alt/supermimic-g1-sim/main/figs/g1_showcase_6skills.gif",
+      desc: "复现 CoRL 2026 Oral SuperMimic：纯 PyTorch 29-DoF Unitree G1 可微正运动学 + 朝向归一化半隐式速度积分世界模型（16步误差 ↓32.7%）+ 24 步想象 BPTT。单卡 T4 14.5 分钟实现 6 类高动态技能 6/6 零失败闭环（回报 0.7982，刚体误差 5.44 cm）。",
+      url: "https://github.com/yimingjiang216-alt/supermimic-g1-sim"
+    },
+    {
+      title: "2. mcp-3dgs · 基于 3D Gaussian Splatting 的具身空间智能服务",
+      badge: "大脑空间记忆 · FastMCP 7 工具",
+      gif: "https://raw.githubusercontent.com/yimingjiang216-alt/mcp-3dgs/main/figs/active_vln_orbit.gif",
+      desc: "在 TUM fr1/desk 真实 RGB-D 场景上构建 4.5 万个各向异性三维语义高斯与 21 个物体实例：排查修复深度流 0.58s 启动滞后鬼影（深度 RMSE 降至 7.39 cm，↓55.2%），实现 100% 开放词汇 3D 定位、候选视角想象（无遮挡率 67.9%→99.7%）与 ESDF 三维避障。",
+      url: "https://github.com/yimingjiang216-alt/mcp-3dgs"
+    },
+    {
+      title: "3. pi05-libero-sim & mini-vla-pi0 · π0/π0.5 架构部署与鲁棒性评测",
+      badge: "运动皮层 VLA · 270 次受控推理",
+      gif: "https://raw.githubusercontent.com/yimingjiang216-alt/supermimic-g1-sim/main/figs/g1_comparison_3methods.gif",
+      desc: "构建 238 万参数轻量化 π0（左右转指令切换动作严格反向 gap 0.995），并在单卡 T4 完成 3B 开源 π0.5 的 LIBERO 机械臂闭环部署；通过 270 次受控推理定量分离随机种子波动（5.11% 等效解）与口语化指令改写劣化（10.55%，偏差扩大 1.83×）。",
+      url: "https://github.com/yimingjiang216-alt/pi05-libero-sim"
+    },
+    {
+      title: "4. rgbd-slam & sfm-3dgs-pipeline · 多模态 SLAM 与 3DGS 重建管线",
+      badge: "三维几何底座 · 稀疏 BA 与回环门控",
+      gif: "https://raw.githubusercontent.com/yimingjiang216-alt/mcp-3dgs/main/figs/multimodal_3dgs_render.png",
+      desc: "实现视觉/激光 SLAM（TUM fr1/xyz 视觉 ATE 4.49 cm，fr1/desk 激光 ATE 9.66 cm），定位短距离重访（基线中位数仅 11.89 cm）引发的回环旋转退化（12.57°），设计 ≥0.30 m 基线门控与 Top-10 内点筛选在 fr1/room 上将全局误差降低 10.4%。",
+      url: "https://github.com/yimingjiang216-alt/rgbd-slam"
+    }
+  ];
+  document.getElementById("portfolio-grid").innerHTML = PROJECTS.map(p => `
+    <div class="proj-card">
+      <img src="${p.gif}" alt="${escapeHtml(p.title)}" loading="lazy">
+      <div style="padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;flex:1;">
+        <div>
+          <span style="font-size:11px;color:#38bdf8;font-weight:700;">${escapeHtml(p.badge)}</span>
+          <h3 style="color:#f8fafc;font-size:15px;margin:4px 0 6px;">${escapeHtml(p.title)}</h3>
+          <p style="font-size:12.5px;color:#cbd5e1;margin-bottom:12px;">${escapeHtml(p.desc)}</p>
+        </div>
+        <a class="ctrl-btn active" style="text-align:center;text-decoration:none;padding:7px;" href="${p.url}" target="_blank">查看 GitHub 仓库与实验报告 →</a>
+      </div>
+    </div>
+  `).join("");
 }
 
 function runLiveSearch() {
   const q = document.getElementById("q-input").value.trim();
   const out = document.getElementById("search-results");
   if (!q) { out.innerHTML = ""; return; }
-  const t0 = performance.now();
-  const hits = bm25Search(q, 6);
-  const dt = (performance.now() - t0).toFixed(2);
-
-  if (hits.length === 0) {
-    out.innerHTML = `<div class="hit-card">未找到匹配结果，请尝试英文术语或核心概念词。</div>`;
-    return;
-  }
-
-  out.innerHTML = `<div style="font-size:12.5px;color:var(--muted);margin-bottom:10px;">共检索 ${PAPERS.length} 篇精读笔记，命中 Top ${hits.length} 条结果（耗时 ${dt} ms）：</div>` +
-    hits.map((h, i) => {
-      const p = h.paper;
-      return `<div class="hit-card">
-        <div class="hit-head">
-          <div>
-            <span style="font-weight:800;color:var(--ink);font-size:15.5px;">#${i + 1} · ${escapeHtml(p.title)}</span>
-            <span class="p-badge" style="margin-left:8px;">${escapeHtml(p.route)}</span>
-            <span style="font-size:12px;color:var(--muted);margin-left:8px;">${escapeHtml(p.year)} · ${escapeHtml(p.org)}</span>
-          </div>
-          <span class="hit-score">BM25 Score: ${h.score.toFixed(2)}</span>
-        </div>
-        <div class="two-q-box" style="margin-bottom:10px;">
-          <div class="q-row"><b>① 预测什么空间：</b>${escapeHtml(p.q1)}</div>
-          <div class="q-row"><b>② 预测出来给谁用：</b>${escapeHtml(p.q2)}</div>
-        </div>
-        <div class="md-body">${renderMarkdown(p.body)}</div>
-      </div>`;
-    }).join("");
+  const hits = bm25Search(q, 5);
+  out.innerHTML = hits.map((h, i) => `
+    <div class="card-block">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <b style="color:#f8fafc;font-size:15px;">#${i + 1} · ${escapeHtml(h.paper.title)} (${escapeHtml(h.paper.route)})</b>
+        <span style="color:#10b981;font-family:Consolas,monospace;font-size:12px;">BM25: ${h.score.toFixed(2)}</span>
+      </div>
+      <div class="two-q-card">
+        <div><b>① 预测什么空间：</b>${escapeHtml(h.paper.q1)}</div>
+        <div><b>② 预测出来给谁用：</b>${escapeHtml(h.paper.q2)}</div>
+      </div>
+      <div class="md-content">${renderMarkdown(h.paper.body)}</div>
+    </div>
+  `).join("");
 }
 
 function runBenchmarkUI() {
@@ -964,147 +1363,28 @@ function runBenchmarkUI() {
     { q: "80ms turn-taking backchannel streaming ASR", exp: ["xplanner-x2turn"] },
     { q: "3D point cloud diffusion policy camera viewpoint invariance", exp: ["dp3-3dvla"] }
   ];
-  let hitsCount = 0;
-  let mrrSum = 0;
-  const rows = BENCH.map((item, idx) => {
-    const res = bm25Search(item.q, 5).map(x => x.paper.id);
-    let rank = -1;
-    for (let r = 0; r < res.length; r++) {
-      if (item.exp.includes(res[r])) { rank = r + 1; break; }
-    }
-    if (rank > 0) { hitsCount++; mrrSum += 1.0 / rank; }
-    return `<tr>
-      <td>${idx + 1}</td>
-      <td><code>${escapeHtml(item.q)}</code></td>
-      <td>${item.exp.join(", ")}</td>
-      <td>${res.slice(0, 3).join(", ")}</td>
-      <td style="color:${rank > 0 ? 'var(--green)' : 'var(--rose)'};font-weight:700;">${rank > 0 ? '✅ Rank #' + rank : '✗ Miss'}</td>
-    </tr>`;
+  let ok = 0, mrr = 0;
+  const rows = BENCH.map((it, idx) => {
+    const got = bm25Search(it.q, 5).map(x => x.paper.id);
+    const rk = got.findIndex(id => it.exp.includes(id)) + 1;
+    if (rk > 0) { ok++; mrr += 1 / rk; }
+    return `<tr><td>${idx + 1}</td><td><code>${escapeHtml(it.q)}</code></td><td>${it.exp.join(", ")}</td><td>${got.slice(0, 3).join(", ")}</td><td style="color:#10b981;font-weight:700;">${rk > 0 ? '✅ Rank #' + rk : '✗'}</td></tr>`;
   }).join("");
-
-  const recall = ((hitsCount / BENCH.length) * 100).toFixed(1);
-  const mrr = (mrrSum / BENCH.length).toFixed(3);
-  document.getElementById("search-results").innerHTML = `
-    <div class="hit-card">
-      <h3 style="color:var(--ink);margin-bottom:8px;">📊 实时评测结果：Recall@5 = <span style="color:var(--green)">${recall}%</span> ｜ MRR = <span style="color:var(--accent-2)">${mrr}</span></h3>
-      <div class="md-body">
-        <table>
-          <thead><tr><th>#</th><th>测试查询 (Query)</th><th>期望命中 (Ground Truth)</th><th>实际召回 Top-3</th><th>状态</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </div>
-  `;
-}
-
-/* ── Comparator Tab ── */
-const RIVAL_PAIRS = [
-  ["walloss", "pi05", "Wall-OSS 1.0 vs π0.5（全梯度协同 vs Stop-Gradient 分层）"],
-  ["act", "diffusion-policy", "ACT vs Diffusion Policy（CVAE 单次前向 vs 多步去噪）"],
-  ["openvla", "pi0", "OpenVLA vs π0（256-bin 离散 Token vs 连续流匹配）"],
-  ["supermimic", "beyondmimic", "SuperMimic vs BeyondMimic（可微世界模型 BPTT vs PPO+引导扩散）"],
-  ["dreamzero", "vjepa2", "DreamZero vs V-JEPA 2（像素+动作联合生成 vs 抽象特征规划）"],
-  ["dp3-3dvla", "mcp-3dgs", "DP3/3D-VLA vs MCP-3DGS（点云扩散策略 vs 语义 3DGS 空间工具链）"]
-];
-
-function initComparator() {
-  const pBox = document.getElementById("preset-pairs");
-  pBox.innerHTML = RIVAL_PAIRS.map(([a, b, label]) =>
-    `<button class="pill-btn" onclick="setPair('${a}','${b}')">${label}</button>`
-  ).join("");
-  const opts = PAPERS.map(p => `<option value="${p.id}">${escapeHtml(p.title)} (${escapeHtml(p.year)})</option>`).join("");
-  document.getElementById("sel-a").innerHTML = opts;
-  document.getElementById("sel-b").innerHTML = opts;
-  setPair("walloss", "pi05");
-}
-
-function setPair(a, b) {
-  document.getElementById("sel-a").value = a;
-  document.getElementById("sel-b").value = b;
-  renderComparison();
+  document.getElementById("search-results").innerHTML = `<div class="card-block"><h3 style="color:#f8fafc;margin-bottom:8px;">📊 15 题实时评测：Recall@5 = <span style="color:#10b981">${((ok/BENCH.length)*100).toFixed(1)}%</span> ｜ MRR = <span style="color:#38bdf8">${(mrr/BENCH.length).toFixed(3)}</span></h3><div class="md-content"><table><thead><tr><th>#</th><th>Query</th><th>Expected</th><th>Top-3 Hits</th><th>Rank</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
 function renderComparison() {
   const a = PAPER_MAP[document.getElementById("sel-a").value] || PAPERS[0];
   const b = PAPER_MAP[document.getElementById("sel-b").value] || PAPERS[1];
-  const renderCol = (p) => `
-    <div class="hit-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span class="p-badge">${escapeHtml(p.route)} · 光谱第 ${p.spec} 档</span>
-        <span style="font-size:12px;color:var(--muted);">${escapeHtml(p.year)}</span>
-      </div>
-      <h3 style="color:var(--ink);font-size:18px;margin:6px 0 2px;">${escapeHtml(p.title)}</h3>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">${escapeHtml(p.org)}</div>
-      <div class="two-q-box">
-        <div class="q-row"><b>① 预测什么空间：</b>${escapeHtml(p.q1)}</div>
-        <div class="q-row"><b>② 预测出来给谁用：</b>${escapeHtml(p.q2)}</div>
-      </div>
-      <div class="md-body">${renderMarkdown(p.body)}</div>
-    </div>
-  `;
-  document.getElementById("comp-output").innerHTML = renderCol(a) + renderCol(b);
+  const col = p => `<div class="card-block"><h3 style="color:#f8fafc;font-size:17px;">${escapeHtml(p.title)} <span style="font-size:12px;color:#38bdf8;">(${escapeHtml(p.route)} · ${escapeHtml(p.year)})</span></h3><div style="font-size:12px;color:#94a3b8;margin-bottom:10px;">${escapeHtml(p.org)}</div><div class="two-q-card"><div><b>① 预测什么空间：</b>${escapeHtml(p.q1)}</div><div><b>② 预测出来给谁用：</b>${escapeHtml(p.q2)}</div></div><div class="md-content">${renderMarkdown(p.body)}</div></div>`;
+  document.getElementById("comp-output").innerHTML = col(a) + col(b);
 }
 
-/* ── Portfolio Tab ── */
-const PROJECTS = [
-  {
-    title: "1. supermimic-g1-sim · Unitree G1 全身控制与可微物理世界模型",
-    badge: "小脑全身控制 · MuJoCo 200Hz 闭环",
-    gif: "https://raw.githubusercontent.com/yimingjiang216-alt/supermimic-g1-sim/main/figs/g1_showcase_6skills.gif",
-    desc: "复现 CoRL 2026 Oral SuperMimic：纯 PyTorch 29-DoF Unitree G1 可微正运动学（误差 < 8.2e-7m）+ 朝向归一化半隐式速度积分世界模型（16步误差 ↓32.7%）+ 24 步想象 BPTT。单卡 T4 14.5 分钟实现步行、奔跑、街舞、跳跃、格斗、倒地起身 6/6 零失败闭环（回报 0.7982，刚体误差 5.44 cm）。",
-    url: "https://github.com/yimingjiang216-alt/supermimic-g1-sim"
-  },
-  {
-    title: "2. mcp-3dgs · 基于 3D Gaussian Splatting 的具身空间智能服务",
-    badge: "大脑空间记忆 · FastMCP 7 工具",
-    gif: "https://raw.githubusercontent.com/yimingjiang216-alt/mcp-3dgs/main/figs/active_vln_orbit.gif",
-    desc: "在 TUM fr1/desk 真实 RGB-D 场景上构建 4.5 万个各向异性三维语义高斯与 21 个物体实例：排查修复深度流 0.58s 启动滞后鬼影（深度 RMSE 从 16.51 压至 7.39 cm，↓55.2%），实现 100% 开放词汇 3D 定位、移动前候选视角想象（无遮挡率 67.9%→99.7%）与 ESDF 三维 100% 避障。",
-    url: "https://github.com/yimingjiang216-alt/mcp-3dgs"
-  },
-  {
-    title: "3. pi05-libero-sim & mini-vla-pi0 · π0/π0.5 架构部署与鲁棒性评测",
-    badge: "运动皮层 VLA · 270 次受控推理",
-    gif: "https://raw.githubusercontent.com/yimingjiang216-alt/supermimic-g1-sim/main/figs/g1_comparison_3methods.gif",
-    desc: "构建 238 万参数轻量化 π0（ViT + Flow Matching + Action Chunking，左右转指令切换动作严格反向 gap 0.995），并在单卡 T4 完成 3B 开源 π0.5 的 LIBERO 机械臂闭环部署；通过 270 次受控推理定量分离随机种子波动（5.11% 等效解）与口语化指令改写劣化（10.55%，偏差扩大 1.83×）。",
-    url: "https://github.com/yimingjiang216-alt/pi05-libero-sim"
-  },
-  {
-    title: "4. rgbd-slam & sfm-3dgs-pipeline · 多模态 SLAM 与 3DGS 重建管线",
-    badge: "三维几何底座 · 稀疏 BA 与回环门控",
-    gif: "https://raw.githubusercontent.com/yimingjiang216-alt/mcp-3dgs/main/figs/multimodal_3dgs_render.png",
-    desc: "从零实现视觉/激光 SLAM（TUM fr1/xyz 视觉 ATE 4.49 cm，fr1/desk 激光 ATE 9.66 cm），定位短距离重访（基线中位数仅 11.89 cm）引发的回环旋转退化（12.57°），设计 ≥0.30 m 基线门控与 Top-10 内点筛选在 fr1/room 上将全局误差降低 10.4%。",
-    url: "https://github.com/yimingjiang216-alt/rgbd-slam"
-  }
-];
-
-function initPortfolio() {
-  document.getElementById("portfolio-grid").innerHTML = PROJECTS.map(p => `
-    <div class="proj-card">
-      <img class="proj-media" src="${p.gif}" alt="${escapeHtml(p.title)}" loading="lazy">
-      <div class="proj-body">
-        <div>
-          <span class="p-badge" style="margin-bottom:6px;display:inline-block;">${escapeHtml(p.badge)}</span>
-          <h3>${escapeHtml(p.title)}</h3>
-          <p>${escapeHtml(p.desc)}</p>
-        </div>
-        <a class="btn-primary" style="text-align:center;display:block;text-decoration:none;" href="${p.url}" target="_blank">查看 GitHub 仓库与实验报告 →</a>
-      </div>
-    </div>
-  `).join("");
-}
-
-function switchTab(tabKey, btn) {
-  document.querySelectorAll(".view-pane").forEach(el => el.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
-  document.getElementById("pane-" + tabKey).classList.add("active");
-  btn.classList.add("active");
-}
-
-initRouteFilters();
-renderMap();
-initSearchTab();
-initComparator();
-initPortfolio();
+initCanvas();
+initOverlays();
+resetCanvasView();
+selectNode("walloss");
+window.addEventListener("resize", resetCanvasView);
 </script>
 </body>
 </html>
