@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Embodied-KB · 具身智能与世界模型交互谱系 (36 篇精读 + 实时检索 + 实操展厅)</title>
+<style>
+  :root {
+    --bg: #0b0f19;
+    --panel: #111827;
+    --panel-2: #1e293b;
+    --border: #26334d;
+    --ink: #f8fafc;
+    --body: #cbd5e1;
+    --muted: #94a3b8;
+    --accent: #3b82f6;
+    --accent-2: #60a5fa;
+    --accent-bg: rgba(59, 130, 246, 0.14);
+    --green: #10b981;
+    --amber: #f59e0b;
+    --purple: #a855f7;
+    --rose: #f43f5e;
+    --cyan: #06b6d4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei UI", sans-serif;
+    background: var(--bg);
+    color: var(--body);
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Top Navigation Bar ── */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(11, 15, 25, 0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #fff;
+    font-size: 16px;
+  }
+  .brand h1 {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: 0.3px;
+  }
+  .brand .sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .nav-tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--panel);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    background: transparent;
+    color: var(--muted);
+    border: 0;
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--ink); }
+  .tab-btn.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.35);
+  }
+  .gh-btn {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .gh-btn:hover { border-color: var(--accent); text-decoration: none; }
+
+  .container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px 24px 48px;
+  }
+  .view-pane { display: none; }
+  .view-pane.active { display: block; }
+
+  /* ── Spectrum Strip ── */
+  .spectrum-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+  }
+  .spectrum-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .spectrum-head h2 {
+    font-size: 14.5px;
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .spectrum-head span {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .spectrum-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+  @media (max-width: 980px) {
+    .spectrum-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .spec-stage {
+    background: rgba(30, 41, 59, 0.65);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .spec-stage:hover, .spec-stage.active {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+  }
+  .spec-stage .st-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-2);
+    text-transform: uppercase;
+  }
+  .spec-stage .st-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 2px 0;
+  }
+  .spec-stage .st-rep {
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  /* ── Route Filter Pills ── */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+    align-items: center;
+  }
+  .pill-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--body);
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .pill-btn:hover { border-color: var(--accent-2); color: var(--ink); }
+  .pill-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* ── Main Split Layout: Left Cognitive Stack + Right Inspector ── */
+  .split-layout {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 1080px) {
+    .split-layout { grid-template-columns: 1fr; }
+  }
+  .layer-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px 18px;
+    margin-bottom: 14px;
+  }
+  .layer-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+  }
+  .layer-head h3 {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .layer-head .clock {
+    font-size: 11.5px;
+    color: var(--muted);
+    font-family: Consolas, monospace;
+  }
+  .paper-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+    gap: 10px;
+  }
+  .paper-node {
+    background: rgba(30, 41, 59, 0.55);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .paper-node:hover {
+    border-color: var(--accent-2);
+    transform: translateY(-1px);
+  }
+  .paper-node.selected {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .paper-node .p-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .paper-node .p-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .paper-node .p-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--accent-2);
+    white-space: nowrap;
+  }
+  .paper-node .p-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .paper-node .p-desc {
+    font-size: 11.8px;
+    color: var(--body);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ── Inspector Panel ── */
+  .inspector {
+    position: sticky;
+    top: 72px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+  }
+  .insp-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .insp-sub {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .two-q-box {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid var(--border);
+    border-left: 3.5px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+  .two-q-box .q-row {
+    font-size: 12.8px;
+    margin-bottom: 6px;
+  }
+  .two-q-box .q-row:last-child { margin-bottom: 0; }
+  .two-q-box b { color: var(--accent-2); }
+  .md-body h1, .md-body h2, .md-body h3 {
+    color: var(--ink);
+    margin: 14px 0 6px;
+    font-size: 14.5px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+  }
+  .md-body h1 { display: none; }
+  .md-body p, .md-body li {
+    font-size: 13px;
+    color: var(--body);
+    margin-bottom: 5px;
+  }
+  .md-body ul, .md-body ol { padding-left: 18px; margin-bottom: 8px; }
+  .md-body pre {
+    background: #090d16;
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 12px;
+    color: #93c5fd;
+    margin: 8px 0;
+  }
+  .md-body blockquote {
+    border-left: 3px solid var(--muted);
+    padding-left: 10px;
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+  .md-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+  .md-body th, .md-body td {
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    text-align: left;
+  }
+  .md-body th { background: var(--panel-2); color: var(--ink); }
+
+  /* ── Search Engine View ── */
+  .search-hero {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 18px;
+  }
+  .search-bar-row {
+    display: flex;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .search-input {
+    flex: 1;
+    background: #090d16;
+    border: 1px solid var(--border);
+    color: var(--ink);
+    padding: 11px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 13.5px;
+  }
+  .btn-secondary {
+    background: var(--panel-2);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .hit-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .hit-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .hit-score {
+    font-family: Consolas, monospace;
+    font-size: 12px;
+    color: var(--green);
+    background: rgba(16, 185, 129, 0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  mark {
+    background: rgba(245, 158, 11, 0.28);
+    color: #fde68a;
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+
+  /* ── Comparator View ── */
+  .comp-controls {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+  }
+  .select-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  select.paper-sel {
+    background: #090d16;
+    color: var(--ink);
+    border: 1px solid var(--border);
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    min-width: 260px;
+  }
+  .comp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 900px) {
+    .comp-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── Portfolio Showcase View ── */
+  .proj-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(410px, 1fr));
+    gap: 18px;
+  }
+  @media (max-width: 860px) {
+    .proj-grid { grid-template-columns: 1fr; }
+  }
+  .proj-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .proj-media {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    background: #090d16;
+    border-bottom: 1px solid var(--border);
+  }
+  .proj-body {
+    padding: 16px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .proj-body h3 {
+    font-size: 16px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .proj-body p {
+    font-size: 13px;
+    color: var(--body);
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+
+  <nav class="topbar">
+    <div class="brand">
+      <div class="brand-logo">KB</div>
+      <div>
+        <h1>Embodied-KB · 具身智能与世界模型交互谱系</h1>
+        <div class="sub">36 篇代表作精读 · 三层认知架构 · 两问定位法 · 实时 BM25 检索 · 实操验证展厅</div>
+      </div>
+    </div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('map', this)">1. 交互式谱系与认知架构</button>
+      <button class="tab-btn" onclick="switchTab('search', this)">2. 实时检索与 30 题评测</button>
+      <button class="tab-btn" onclick="switchTab('compare', this)">3. 论文两两对比器</button>
+      <button class="tab-btn" onclick="switchTab('portfolio', this)">4. 实操开源项目展厅</button>
+    </div>
+    <a class="gh-btn" href="https://github.com/yimingjiang216-alt/embodied-kb" target="_blank">
+      ★ GitHub 仓库主页
+    </a>
+  </nav>
+
+  <div class="container">
+
+    <!-- ==================== TAB 1: LINEAGE & COGNITIVE MAP ==================== -->
+    <div id="pane-map" class="view-pane active">
+      <div class="spectrum-box">
+        <div class="spectrum-head">
+          <h2>一、横向功能光谱（点击任意档位筛选论文：越往右物理越刚性、动作接口越底层）</h2>
+          <span>判断任何论文先问两句：① 它预测什么空间？ ② 预测出来给谁用？</span>
+        </div>
+        <div class="spectrum-grid" id="spectrum-grid">
+          <div class="spec-stage" onclick="filterSpectrum(1, this)">
+            <div class="st-num">Stage 1 · 符号/事件/语音</div>
+            <div class="st-name">代码编排与事件规划</div>
+            <div class="st-rep">Argon · X-Planner · X2-Turn</div>
+          </div>
+          <div class="spec-stage" onclick="filterSpectrum(2, this)">
+            <div class="st-num">Stage 2 · 3D几何/离散动作</div>
+            <div class="st-name">3D显式空间与离散Token</div>
+            <div class="st-rep">MCP-3DGS · DP3 · OpenVLA · FAST</div>
+          </div>
+          <div class="spec-stage" onclick="filterSpectrum(3, this)">
+            <div class="st-num">Stage 3 · 中间表征</div>
+            <div class="st-name">子目标图与隐式动作桥</div>
+            <div class="st-rep">π0.5 · π0.7 BAGEL · AgiBot GO-1</div>
+          </div>
+          <div class="spec-stage" onclick="filterSpectrum(4, this)">
+            <div class="st-num">Stage 4 · 像素/潜空间预演</div>
+            <div class="st-name">视频与潜变量世界模型</div>
+            <div class="st-rep">DreamerV3 · Cosmos · DreamZero · VPP2</div>
+          </div>
+          <div class="spec-stage" onclick="filterSpectrum(5, this)">
+            <div class="st-num">Stage 5 · 连续流/可微动力学</div>
+            <div class="st-name">流匹配VLA与物理状态WM</div>
+            <div class="st-rep">π0 · Wall-OSS 1.0 · RDT-1B · SuperMimic</div>
+          </div>
+          <div class="spec-stage" onclick="filterSpectrum(6, this)">
+            <div class="st-num">Stage 6 · 手写物理引擎</div>
+            <div class="st-name">精确刚体与接触仿真</div>
+            <div class="st-rep">Isaac Lab · MuJoCo</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-bar" id="route-filters"></div>
+
+      <div class="split-layout">
+        <div id="layers-container"></div>
+        <div class="inspector" id="paper-inspector"></div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 2: LIVE BM25 SEARCH & BENCHMARK ==================== -->
+    <div id="pane-search" class="view-pane">
+      <div class="search-hero">
+        <h2 style="color:var(--ink);font-size:17px;">浏览器端实时检索引擎（英文术语 + 中文二元分词 BM25，零延迟带出处返回）</h2>
+        <div class="search-bar-row">
+          <input id="q-input" class="search-input" type="text" placeholder="输入英文术语或中文问题，例如：stop-gradient 和梯度全通有什么区别？" oninput="runLiveSearch()">
+          <button class="btn-primary" onclick="runLiveSearch()">立即检索</button>
+          <button class="btn-secondary" onclick="runBenchmarkUI()">▶ 运行 30 题标准评测集</button>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">💡 点击下方高频面试题一键检索：</div>
+        <div class="filter-bar" id="preset-queries" style="margin-bottom:0;"></div>
+      </div>
+      <div id="search-results"></div>
+    </div>
+
+    <!-- ==================== TAB 3: SIDE-BY-SIDE PAPER COMPARATOR ==================== -->
+    <div id="pane-compare" class="view-pane">
+      <div class="comp-controls">
+        <h2 style="color:var(--ink);font-size:17px;">论文两两正面对比器（定位路线分歧与前后代演进）</h2>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;">点击经典对决组合，或在下拉框任选两篇论文并排比对：</div>
+        <div class="filter-bar" id="preset-pairs" style="margin-top:10px;margin-bottom:8px;"></div>
+        <div class="select-row">
+          <select id="sel-a" class="paper-sel" onchange="renderComparison()"></select>
+          <span style="font-weight:800;color:var(--accent-2);">VS</span>
+          <select id="sel-b" class="paper-sel" onchange="renderComparison()"></select>
+        </div>
+      </div>
+      <div class="comp-grid" id="comp-output"></div>
+    </div>
+
+    <!-- ==================== TAB 4: PORTFOLIO SHOWCASE ==================== -->
+    <div id="pane-portfolio" class="view-pane">
+      <div class="spectrum-box" style="margin-bottom:18px;">
+        <h2 style="color:var(--ink);font-size:17px;margin-bottom:4px;">理论谱系对应的 6 个实操开源验证仓库（GitHub: yimingjiang216-alt）</h2>
+        <div style="font-size:13px;color:var(--muted);">从顶层「3DGS 空间记忆与主动感知（大脑）」→「π0/π0.5 VLA 机械臂部署与鲁棒性评测（运动皮层）」→「Unitree G1 29-DoF 可微物理世界模型（小脑）」的完整实操验证。</div>
+      </div>
+      <div class="proj-grid" id="portfolio-grid"></div>
+    </div>
+
+  </div>
+
+<script src="kb_data.js"></script>
+<script>
+const DATA = window.KB_DATA || { papers: [] };
+const PAPERS = DATA.papers;
+const PAPER_MAP = Object.fromEntries(PAPERS.map(p => [p.id, p]));
+
+let activeRoute = "ALL";
+let activeSpec = null;
+let selectedPaperId = "walloss";
+
+const LAYERS = [
+  { key: "voice_brain", title: "0. 实时语音与人机交互入口（80ms 帧同步话轮预测）", clock: "时标：80ms 帧级 ｜ 输出：流式文本 + 6 类话轮状态" },
+  { key: "brain", title: "1. 大脑 · 决策、事件规划、目标想象与 3DGS 空间记忆", clock: "时标：秒级 ｜ 输出：事件子目标 / 候选视角 / 3D 目标图 / 代码" },
+  { key: "cortex", title: "2. 运动皮层 · VLA 与生成式模仿学习策略", clock: "时标：10~50Hz 毫秒级 ｜ 输出：未来 k 步连续动作块 (Action Chunk)" },
+  { key: "world_model", title: "3. 世界模型与 WAM 预演层（潜空间 / 像素视频 / 范式修正）", clock: "用途：当梦境练习场 / 当神经数据工厂 / 视频+动作联合生成 / 训练期当老师" },
+  { key: "cerebellum", title: "4. 小脑 · 人形全身运动控制 (WBC) & 物理状态可微世界模型", clock: "时标：50Hz 控制 / 200Hz 物理 ｜ 输出：29-DoF 全身关节设定点与力矩" },
+  { key: "infra", title: "5. 物理仿真器与大规模数据基建", clock: "光谱最右端：GPU 矢量化手写刚体/接触物理 + 数据扩增" }
+];
+
+function escapeHtml(s) {
+  return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function renderMarkdown(md) {
+  const lines = String(md || "").split("\n");
+  let html = "";
+  let inPre = false;
+  let inTable = false;
+  let inList = false;
+
+  const inlineFmt = (str) => {
+    let s = escapeHtml(str);
+    s = s.replace(/\*\*(.+?)\*\*/g, "<b style='color:#f8fafc'>$1</b>");
+    s = s.replace(/`([^`]+)`/g, "<code style='background:#1e293b;color:#93c5fd;padding:1px 5px;border-radius:4px;font-family:Consolas,monospace;font-size:12px;'>$1</code>");
+    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, "<a href='$2' target='_blank'>$1</a>");
+    return s;
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const line = raw.trim();
+    if (line.startsWith("```")) {
+      if (inList) { html += "</ul>"; inList = false; }
+      if (inTable) { html += "</tbody></table>"; inTable = false; }
+      if (!inPre) { html += "<pre>"; inPre = true; }
+      else { html += "</pre>"; inPre = false; }
+      continue;
+    }
+    if (inPre) {
+      html += escapeHtml(raw) + "\n";
+      continue;
+    }
+    if (line.startsWith("|") && line.endsWith("|")) {
+      if (inList) { html += "</ul>"; inList = false; }
+      const cells = line.slice(1, -1).split("|").map(c => c.trim());
+      if (cells.every(c => /^[:\-]+$/.test(c))) continue;
+      if (!inTable) {
+        html += "<table><thead><tr>" + cells.map(c => `<th>${inlineFmt(c)}</th>`).join("") + "</tr></thead><tbody>";
+        inTable = true;
+      } else {
+        html += "<tr>" + cells.map(c => `<td>${inlineFmt(c)}</td>`).join("") + "</tr>";
+      }
+      continue;
+    } else if (inTable) {
+      html += "</tbody></table>";
+      inTable = false;
+    }
+
+    if (line.startsWith("# ")) {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<h1>${inlineFmt(line.slice(2))}</h1>`;
+    } else if (line.startsWith("## ")) {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<h2>${inlineFmt(line.slice(3))}</h2>`;
+    } else if (line.startsWith("### ")) {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<h3>${inlineFmt(line.slice(4))}</h3>`;
+    } else if (line.startsWith("> ")) {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<blockquote>${inlineFmt(line.slice(2))}</blockquote>`;
+    } else if (/^(\-|\d+\.)\s+/.test(line)) {
+      if (!inList) { html += "<ul>"; inList = true; }
+      html += `<li>${inlineFmt(line.replace(/^(\-|\d+\.)\s+/, ""))}</li>`;
+    } else if (line === "---") {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += "<hr style='border:0;border-top:1px solid var(--border);margin:10px 0;'>";
+    } else if (line.length > 0) {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<p>${inlineFmt(line)}</p>`;
+    }
+  }
+  if (inList) html += "</ul>";
+  if (inTable) html += "</tbody></table>";
+  if (inPre) html += "</pre>";
+  return html;
+}
+
+function initRouteFilters() {
+  const routes = ["ALL", "VLA", "模仿底座", "3D-VLA & 3DGS", "大脑-语音 & LLM", "WM-latent", "WM-视频 & WAM", "WBC-小脑 & 状态WM", "VLN", "仿真 & 范式修正"];
+  const bar = document.getElementById("route-filters");
+  bar.innerHTML = `<span style="font-size:12px;color:var(--muted);">按技术支线筛选：</span>` + routes.map(r => {
+    const label = r === "ALL" ? `全部 (${PAPERS.length} 篇)` : r;
+    const cls = r === activeRoute ? "pill-btn active" : "pill-btn";
+    return `<button class="${cls}" onclick="setRouteFilter('${r}')">${label}</button>`;
+  }).join("");
+}
+
+function matchRouteGroup(paper, group) {
+  if (group === "ALL") return true;
+  if (group === "3D-VLA & 3DGS") return ["3D-VLA", "3DGS-空间"].includes(paper.route);
+  if (group === "大脑-语音 & LLM") return ["大脑-语音", "LLM路线"].includes(paper.route);
+  if (group === "WM-视频 & WAM") return ["WM-视频", "WM-平台", "WM-数据工厂", "WM-交互", "WAM", "WM-JEPA"].includes(paper.route);
+  if (group === "WBC-小脑 & 状态WM") return ["WBC-小脑", "WM-状态"].includes(paper.route);
+  if (group === "仿真 & 范式修正") return ["仿真", "范式修正"].includes(paper.route);
+  if (group === "VLA") return ["VLA", "VLA-工具", "VLA+RL"].includes(paper.route);
+  return paper.route === group;
+}
+
+function setRouteFilter(r) {
+  activeRoute = r;
+  activeSpec = null;
+  document.querySelectorAll(".spec-stage").forEach(el => el.classList.remove("active"));
+  initRouteFilters();
+  renderMap();
+}
+
+function filterSpectrum(stageNum, el) {
+  if (activeSpec === stageNum) {
+    activeSpec = null;
+    el.classList.remove("active");
+  } else {
+    activeSpec = stageNum;
+    document.querySelectorAll(".spec-stage").forEach(x => x.classList.remove("active"));
+    el.classList.add("active");
+  }
+  renderMap();
+}
+
+function renderMap() {
+  const container = document.getElementById("layers-container");
+  let html = "";
+  for (const layer of LAYERS) {
+    const items = PAPERS.filter(p => p.layer === layer.key && matchRouteGroup(p, activeRoute) && (!activeSpec || p.spec === activeSpec));
+    if (items.length === 0) continue;
+    html += `<div class="layer-card">
+      <div class="layer-head">
+        <h3>${layer.title} (${items.length})</h3>
+        <span class="clock">${layer.clock}</span>
+      </div>
+      <div class="paper-grid">
+        ${items.map(p => `
+          <div class="paper-node ${p.id === selectedPaperId ? 'selected' : ''}" onclick="selectPaper('${p.id}')">
+            <div class="p-top">
+              <span class="p-title">${escapeHtml(p.title)}</span>
+              <span class="p-badge">${escapeHtml(p.route)}</span>
+            </div>
+            <div class="p-meta">${escapeHtml(p.year)} · ${escapeHtml(p.org.split('(')[0].trim())}</div>
+            <div class="p-desc">${escapeHtml(p.q2)}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html || `<div class="layer-card">当前筛选条件下暂无条目，请点击「全部」重置。</div>`;
+  renderInspector();
+}
+
+function selectPaper(pid) {
+  selectedPaperId = pid;
+  renderMap();
+}
+
+function renderInspector() {
+  const p = PAPER_MAP[selectedPaperId] || PAPERS[0];
+  if (!p) return;
+  const box = document.getElementById("paper-inspector");
+  box.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <span class="p-badge" style="font-size:12px;padding:2px 9px;">${escapeHtml(p.route)} · 光谱第 ${p.spec} 档</span>
+      <span style="font-size:12px;color:var(--muted);">${escapeHtml(p.year)}</span>
+    </div>
+    <div class="insp-title" style="margin-top:6px;">${escapeHtml(p.title)}</div>
+    <div class="insp-sub">${escapeHtml(p.org)}</div>
+    <div class="two-q-box">
+      <div class="q-row"><b>① 预测什么空间：</b>${escapeHtml(p.q1)}</div>
+      <div class="q-row"><b>② 预测出来给谁用：</b>${escapeHtml(p.q2)}</div>
+    </div>
+    <div class="md-body">${renderMarkdown(p.body)}</div>
+  `;
+}
+
+/* ── Client-Side BM25 + Bigram Search ── */
+function tokenize(text) {
+  const s = String(text || "").toLowerCase();
+  const en = s.match(/[a-zα-ωπ0-9][a-zα-ωπ0-9_.\-]*/g) || [];
+  const toks = en.filter(t => t.length > 1);
+  const hanMatches = s.match(/[\u4e00-\u9fff]+/g) || [];
+  for (const seg of hanMatches) {
+    if (seg.length >= 2) {
+      for (let i = 0; i < seg.length - 1; i++) toks.push(seg.slice(i, i + 2));
+      if (seg.length >= 3 && seg.length <= 6) toks.push(seg);
+    }
+  }
+  return toks;
+}
+
+const DOC_TOKENS = PAPERS.map(p => tokenize(p.title + " " + p.route + " " + p.org + " " + p.q1 + " " + p.q2 + " " + p.body));
+const AVG_DL = DOC_TOKENS.reduce((acc, d) => acc + d.length, 0) / Math.max(DOC_TOKENS.length, 1);
+const DF = {};
+const TF = DOC_TOKENS.map(d => {
+  const counts = {};
+  const seen = new Set();
+  for (const w of d) {
+    counts[w] = (counts[w] || 0) + 1;
+    seen.add(w);
+  }
+  for (const w of seen) DF[w] = (DF[w] || 0) + 1;
+  return counts;
+});
+
+function bm25Search(query, k = 8) {
+  const qToks = tokenize(query);
+  const N = PAPERS.length;
+  const k1 = 1.5, b = 0.75;
+  const scores = PAPERS.map((p, idx) => {
+    let s = 0;
+    const tf = TF[idx];
+    const dl = DOC_TOKENS[idx].length;
+    for (const w of qToks) {
+      const f = tf[w] || 0;
+      if (!f) continue;
+      const df = DF[w] || 0;
+      const idf = Math.log((N - df + 0.5) / (df + 0.5) + 1.0);
+      s += idf * (f * (k1 + 1)) / (f + k1 * (1 - b + b * dl / AVG_DL));
+    }
+    return { paper: p, score: s };
+  }).filter(x => x.score > 0);
+  scores.sort((a, b) => b.score - a.score);
+  return scores.slice(0, k);
+}
+
+const PRESET_QUERIES = [
+  "stop-gradient 梯度全通 Wall-OSS π0.5 协同训练",
+  "Action Chunking ACT Diffusion Policy 多峰分布",
+  "SuperMimic 可微世界模型 BPTT 全身控制 BeyondMimic",
+  "为什么 VLA 不是大脑 运动皮层 三层认知架构",
+  "DP3 三维点云 视角不变性 MCP-3DGS",
+  "RDT-1B 128维统一物理动作空间 双臂",
+  "X2-Turn 实时语音 80ms 话轮预测 backchannel 附和",
+  "未来只当老师 FDM LingBot 双查询蒸馏",
+  "DreamZero 闭环 KV cache 视频世界模型 7Hz",
+  "AgiBot GO-1 ViLLA 隐式动作规划 Latent Planner"
+];
+
+function initSearchTab() {
+  const box = document.getElementById("preset-queries");
+  box.innerHTML = PRESET_QUERIES.map(q =>
+    `<button class="pill-btn" onclick="setQuery('${q}')">${q}</button>`
+  ).join("");
+  setQuery(PRESET_QUERIES[0]);
+}
+
+function setQuery(q) {
+  document.getElementById("q-input").value = q;
+  runLiveSearch();
+}
+
+function runLiveSearch() {
+  const q = document.getElementById("q-input").value.trim();
+  const out = document.getElementById("search-results");
+  if (!q) { out.innerHTML = ""; return; }
+  const t0 = performance.now();
+  const hits = bm25Search(q, 6);
+  const dt = (performance.now() - t0).toFixed(2);
+
+  if (hits.length === 0) {
+    out.innerHTML = `<div class="hit-card">未找到匹配结果，请尝试英文术语或核心概念词。</div>`;
+    return;
+  }
+
+  out.innerHTML = `<div style="font-size:12.5px;color:var(--muted);margin-bottom:10px;">共检索 ${PAPERS.length} 篇精读笔记，命中 Top ${hits.length} 条结果（耗时 ${dt} ms）：</div>` +
+    hits.map((h, i) => {
+      const p = h.paper;
+      return `<div class="hit-card">
+        <div class="hit-head">
+          <div>
+            <span style="font-weight:800;color:var(--ink);font-size:15.5px;">#${i + 1} · ${escapeHtml(p.title)}</span>
+            <span class="p-badge" style="margin-left:8px;">${escapeHtml(p.route)}</span>
+            <span style="font-size:12px;color:var(--muted);margin-left:8px;">${escapeHtml(p.year)} · ${escapeHtml(p.org)}</span>
+          </div>
+          <span class="hit-score">BM25 Score: ${h.score.toFixed(2)}</span>
+        </div>
+        <div class="two-q-box" style="margin-bottom:10px;">
+          <div class="q-row"><b>① 预测什么空间：</b>${escapeHtml(p.q1)}</div>
+          <div class="q-row"><b>② 预测出来给谁用：</b>${escapeHtml(p.q2)}</div>
+        </div>
+        <div class="md-body">${renderMarkdown(p.body)}</div>
+      </div>`;
+    }).join("");
+}
+
+function runBenchmarkUI() {
+  const BENCH = [
+    { q: "flow matching timestep beta distribution", exp: ["pi0", "gr00t", "walloss"] },
+    { q: "KV cache attention keys values", exp: ["pi0", "dreamzero"] },
+    { q: "RSSM deterministic stochastic path", exp: ["planet", "dreamer", "dreamerv3"] },
+    { q: "advantage conditioning value function", exp: ["pistar06"] },
+    { q: "latent action model VQ codebook unsupervised", exp: ["genie", "agibot-go1"] },
+    { q: "DCT discrete cosine transform action tokenization BPE", exp: ["fast"] },
+    { q: "subgoal image generation world model BAGEL", exp: ["pi07"] },
+    { q: "twohot symlog distributional critic", exp: ["dreamerv3", "pistar06"] },
+    { q: "MoT mixture of transformers action expert", exp: ["vpp2", "pi07", "walloss"] },
+    { q: "Action Chunking Temporal Ensembling CVAE", exp: ["act"] },
+    { q: "Receding Horizon Control DDPM DDIM action diffusion", exp: ["diffusion-policy"] },
+    { q: "128-dim physically interpretable unified action space", exp: ["rdt1b"] },
+    { q: "Differentiable FK heading canonicalization BPTT world model", exp: ["supermimic"] },
+    { q: "80ms turn-taking backchannel streaming ASR", exp: ["xplanner-x2turn"] },
+    { q: "3D point cloud diffusion policy camera viewpoint invariance", exp: ["dp3-3dvla"] }
+  ];
+  let hitsCount = 0;
+  let mrrSum = 0;
+  const rows = BENCH.map((item, idx) => {
+    const res = bm25Search(item.q, 5).map(x => x.paper.id);
+    let rank = -1;
+    for (let r = 0; r < res.length; r++) {
+      if (item.exp.includes(res[r])) { rank = r + 1; break; }
+    }
+    if (rank > 0) { hitsCount++; mrrSum += 1.0 / rank; }
+    return `<tr>
+      <td>${idx + 1}</td>
+      <td><code>${escapeHtml(item.q)}</code></td>
+      <td>${item.exp.join(", ")}</td>
+      <td>${res.slice(0, 3).join(", ")}</td>
+      <td style="color:${rank > 0 ? 'var(--green)' : 'var(--rose)'};font-weight:700;">${rank > 0 ? '✅ Rank #' + rank : '✗ Miss'}</td>
+    </tr>`;
+  }).join("");
+
+  const recall = ((hitsCount / BENCH.length) * 100).toFixed(1);
+  const mrr = (mrrSum / BENCH.length).toFixed(3);
+  document.getElementById("search-results").innerHTML = `
+    <div class="hit-card">
+      <h3 style="color:var(--ink);margin-bottom:8px;">📊 实时评测结果：Recall@5 = <span style="color:var(--green)">${recall}%</span> ｜ MRR = <span style="color:var(--accent-2)">${mrr}</span></h3>
+      <div class="md-body">
+        <table>
+          <thead><tr><th>#</th><th>测试查询 (Query)</th><th>期望命中 (Ground Truth)</th><th>实际召回 Top-3</th><th>状态</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+/* ── Comparator Tab ── */
+const RIVAL_PAIRS = [
+  ["walloss", "pi05", "Wall-OSS 1.0 vs π0.5（全梯度协同 vs Stop-Gradient 分层）"],
+  ["act", "diffusion-policy", "ACT vs Diffusion Policy（CVAE 单次前向 vs 多步去噪）"],
+  ["openvla", "pi0", "OpenVLA vs π0（256-bin 离散 Token vs 连续流匹配）"],
+  ["supermimic", "beyondmimic", "SuperMimic vs BeyondMimic（可微世界模型 BPTT vs PPO+引导扩散）"],
+  ["dreamzero", "vjepa2", "DreamZero vs V-JEPA 2（像素+动作联合生成 vs 抽象特征规划）"],
+  ["dp3-3dvla", "mcp-3dgs", "DP3/3D-VLA vs MCP-3DGS（点云扩散策略 vs 语义 3DGS 空间工具链）"]
+];
+
+function initComparator() {
+  const pBox = document.getElementById("preset-pairs");
+  pBox.innerHTML = RIVAL_PAIRS.map(([a, b, label]) =>
+    `<button class="pill-btn" onclick="setPair('${a}','${b}')">${label}</button>`
+  ).join("");
+  const opts = PAPERS.map(p => `<option value="${p.id}">${escapeHtml(p.title)} (${escapeHtml(p.year)})</option>`).join("");
+  document.getElementById("sel-a").innerHTML = opts;
+  document.getElementById("sel-b").innerHTML = opts;
+  setPair("walloss", "pi05");
+}
+
+function setPair(a, b) {
+  document.getElementById("sel-a").value = a;
+  document.getElementById("sel-b").value = b;
+  renderComparison();
+}
+
+function renderComparison() {
+  const a = PAPER_MAP[document.getElementById("sel-a").value] || PAPERS[0];
+  const b = PAPER_MAP[document.getElementById("sel-b").value] || PAPERS[1];
+  const renderCol = (p) => `
+    <div class="hit-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="p-badge">${escapeHtml(p.route)} · 光谱第 ${p.spec} 档</span>
+        <span style="font-size:12px;color:var(--muted);">${escapeHtml(p.year)}</span>
+      </div>
+      <h3 style="color:var(--ink);font-size:18px;margin:6px 0 2px;">${escapeHtml(p.title)}</h3>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">${escapeHtml(p.org)}</div>
+      <div class="two-q-box">
+        <div class="q-row"><b>① 预测什么空间：</b>${escapeHtml(p.q1)}</div>
+        <div class="q-row"><b>② 预测出来给谁用：</b>${escapeHtml(p.q2)}</div>
+      </div>
+      <div class="md-body">${renderMarkdown(p.body)}</div>
+    </div>
+  `;
+  document.getElementById("comp-output").innerHTML = renderCol(a) + renderCol(b);
+}
+
+/* ── Portfolio Tab ── */
+const PROJECTS = [
+  {
+    title: "1. supermimic-g1-sim · Unitree G1 全身控制与可微物理世界模型",
+    badge: "小脑全身控制 · MuJoCo 200Hz 闭环",
+    gif: "https://raw.githubusercontent.com/yimingjiang216-alt/supermimic-g1-sim/main/figs/g1_showcase_6skills.gif",
+    desc: "复现 CoRL 2026 Oral SuperMimic：纯 PyTorch 29-DoF Unitree G1 可微正运动学（误差 < 8.2e-7m）+ 朝向归一化半隐式速度积分世界模型（16步误差 ↓32.7%）+ 24 步想象 BPTT。单卡 T4 14.5 分钟实现步行、奔跑、街舞、跳跃、格斗、倒地起身 6/6 零失败闭环（回报 0.7982，刚体误差 5.44 cm）。",
+    url: "https://github.com/yimingjiang216-alt/supermimic-g1-sim"
+  },
+  {
+    title: "2. mcp-3dgs · 基于 3D Gaussian Splatting 的具身空间智能服务",
+    badge: "大脑空间记忆 · FastMCP 7 工具",
+    gif: "https://raw.githubusercontent.com/yimingjiang216-alt/mcp-3dgs/main/figs/active_vln_orbit.gif",
+    desc: "在 TUM fr1/desk 真实 RGB-D 场景上构建 4.5 万个各向异性三维语义高斯与 21 个物体实例：排查修复深度流 0.58s 启动滞后鬼影（深度 RMSE 从 16.51 压至 7.39 cm，↓55.2%），实现 100% 开放词汇 3D 定位、移动前候选视角想象（无遮挡率 67.9%→99.7%）与 ESDF 三维 100% 避障。",
+    url: "https://github.com/yimingjiang216-alt/mcp-3dgs"
+  },
+  {
+    title: "3. pi05-libero-sim & mini-vla-pi0 · π0/π0.5 架构部署与鲁棒性评测",
+    badge: "运动皮层 VLA · 270 次受控推理",
+    gif: "https://raw.githubusercontent.com/yimingjiang216-alt/supermimic-g1-sim/main/figs/g1_comparison_3methods.gif",
+    desc: "构建 238 万参数轻量化 π0（ViT + Flow Matching + Action Chunking，左右转指令切换动作严格反向 gap 0.995），并在单卡 T4 完成 3B 开源 π0.5 的 LIBERO 机械臂闭环部署；通过 270 次受控推理定量分离随机种子波动（5.11% 等效解）与口语化指令改写劣化（10.55%，偏差扩大 1.83×）。",
+    url: "https://github.com/yimingjiang216-alt/pi05-libero-sim"
+  },
+  {
+    title: "4. rgbd-slam & sfm-3dgs-pipeline · 多模态 SLAM 与 3DGS 重建管线",
+    badge: "三维几何底座 · 稀疏 BA 与回环门控",
+    gif: "https://raw.githubusercontent.com/yimingjiang216-alt/mcp-3dgs/main/figs/multimodal_3dgs_render.png",
+    desc: "从零实现视觉/激光 SLAM（TUM fr1/xyz 视觉 ATE 4.49 cm，fr1/desk 激光 ATE 9.66 cm），定位短距离重访（基线中位数仅 11.89 cm）引发的回环旋转退化（12.57°），设计 ≥0.30 m 基线门控与 Top-10 内点筛选在 fr1/room 上将全局误差降低 10.4%。",
+    url: "https://github.com/yimingjiang216-alt/rgbd-slam"
+  }
+];
+
+function initPortfolio() {
+  document.getElementById("portfolio-grid").innerHTML = PROJECTS.map(p => `
+    <div class="proj-card">
+      <img class="proj-media" src="${p.gif}" alt="${escapeHtml(p.title)}" loading="lazy">
+      <div class="proj-body">
+        <div>
+          <span class="p-badge" style="margin-bottom:6px;display:inline-block;">${escapeHtml(p.badge)}</span>
+          <h3>${escapeHtml(p.title)}</h3>
+          <p>${escapeHtml(p.desc)}</p>
+        </div>
+        <a class="btn-primary" style="text-align:center;display:block;text-decoration:none;" href="${p.url}" target="_blank">查看 GitHub 仓库与实验报告 →</a>
+      </div>
+    </div>
+  `).join("");
+}
+
+function switchTab(tabKey, btn) {
+  document.querySelectorAll(".view-pane").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+  document.getElementById("pane-" + tabKey).classList.add("active");
+  btn.classList.add("active");
+}
+
+initRouteFilters();
+renderMap();
+initSearchTab();
+initComparator();
+initPortfolio();
+</script>
+</body>
+</html>
