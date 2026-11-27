@@ -598,15 +598,14 @@
     </div>
 
     <div class="hud-box mode-tabs">
-      <button class="mode-btn active" onclick="setViewMode('canvas', this)">🗺️ Archify 拓扑谱系画布</button>
-      <button class="mode-btn" onclick="setViewMode('search', this)">🔍 实时 BM25 检索与评测</button>
-      <button class="mode-btn" onclick="setViewMode('compare', this)">⚔️ 论文两两正面对比</button>
-      <button class="mode-btn" onclick="setViewMode('portfolio', this)">🚀 6 大实操开源项目展厅</button>
+      <button class="mode-btn active" id="tab-btn-canvas" onclick="setViewMode('canvas', this)">🗺️ 36篇拓扑谱系画布</button>
+      <button class="mode-btn" id="tab-btn-archify" onclick="setViewMode('archify', this)">✦ Archify 交互架构与拆解中心</button>
+      <button class="mode-btn" id="tab-btn-search" onclick="setViewMode('search', this)">🔍 实时 BM25 检索与评测</button>
+      <button class="mode-btn" id="tab-btn-compare" onclick="setViewMode('compare', this)">⚔️ 论文两两正面对比</button>
+      <button class="mode-btn" id="tab-btn-portfolio" onclick="setViewMode('portfolio', this)">🚀 实操开源项目展厅</button>
     </div>
 
     <div class="hud-box" style="gap:8px;">
-      <a class="ctrl-btn" style="text-decoration:none;color:#38bdf8;font-weight:700;" href="archify.html" target="_blank">✦ Archify 一页式图解</a>
-      <a class="ctrl-btn" style="text-decoration:none;color:#10b981;font-weight:700;" href="architecture.html" target="_blank">❖ Archify 架构全图</a>
       <button class="ctrl-btn" onclick="resetCanvasView()">⌖ 自适应居中</button>
       <button class="ctrl-btn" onclick="zoomCanvas(1.15)">＋ 放大</button>
       <button class="ctrl-btn" onclick="zoomCanvas(0.87)">－ 缩小</button>
@@ -659,6 +658,25 @@
       <div id="dr-md" class="md-content"></div>
     </div>
   </aside>
+
+  <!-- Overlay 0: Unified Archify Interactive Center -->
+  <div id="ov-archify" class="overlay-view" style="padding:58px 0 0 0;overflow:hidden;">
+    <div style="display:flex;flex-direction:column;width:100%;height:calc(100vh - 58px);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 18px;background:rgba(15,23,42,0.95);border-bottom:1px solid rgba(148,163,184,0.18);gap:10px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;" id="archify-subtabs">
+          <span style="font-size:12px;color:#38bdf8;font-weight:800;margin-right:4px;">🌟 大框架全景：</span>
+          <button class="ctrl-btn active" onclick="switchArchifyDoc('panorama.html', this)">🌐 全栈大框架 Archify 全景总图（点击节点可下钻各项目）</button>
+          <button class="ctrl-btn" onclick="switchArchifyDoc('archify.html', this)">📄 全栈 8 大项目一页式全景拆解 (Explainer)</button>
+          <span style="font-size:12px;color:#64748b;margin:0 4px;">| 单项目直达：</span>
+          <button class="ctrl-btn" onclick="switchArchifyDoc('vla_arch.html', this)">VLA-Action-Lab</button>
+          <button class="ctrl-btn" onclick="switchArchifyDoc('sm_arch.html', this)">SuperMimic-G1</button>
+          <button class="ctrl-btn" onclick="switchArchifyDoc('mcp_arch.html', this)">MCP-3DGS</button>
+          <button class="ctrl-btn" onclick="switchArchifyDoc('kb_arch.html', this)">Embodied-KB</button>
+        </div>
+      </div>
+      <iframe id="archify-iframe" src="panorama.html" style="flex:1;width:100%;border:none;background:#0b1120;"></iframe>
+    </div>
+  </div>
 
   <!-- Overlay 1: Live BM25 Search & Benchmark -->
   <div id="ov-search" class="overlay-view">
@@ -1282,6 +1300,26 @@ function initOverlays() {
   document.getElementById("sel-b").value = "pi05";
   renderComparison();
 
+function switchArchifyDoc(docUrl, btn) {
+  document.getElementById("archify-iframe").src = docUrl;
+  if (btn) {
+    document.querySelectorAll("#archify-subtabs .ctrl-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  }
+}
+function openEmbeddedArchify(docUrl) {
+  const tabBtn = document.getElementById("tab-btn-archify");
+  setViewMode("archify", tabBtn);
+  const subBtns = document.querySelectorAll("#archify-subtabs .ctrl-btn");
+  subBtns.forEach(b => {
+    if ((b.getAttribute("onclick") || "").includes(docUrl)) {
+      b.classList.add("active");
+    } else {
+      b.classList.remove("active");
+    }
+  });
+  document.getElementById("archify-iframe").src = docUrl;
+}
   const PROJECTS = [
     {
       title: "1. supermimic-g1-sim · Unitree G1 全身控制与可微物理世界模型",
@@ -1289,7 +1327,8 @@ function initOverlays() {
       gif: "https://raw.githubusercontent.com/yimingjiang216-alt/supermimic-g1-sim/main/figs/g1_showcase_6skills.gif",
       desc: "复现 CoRL 2026 Oral SuperMimic：纯 PyTorch 29-DoF Unitree G1 解析正运动学辅助头 + 航向角规范化可微世界模型 + H=8 步路径导数反传。单卡 T4 实现 6 类高动态技能 0/6 跌倒闭环（归一化回报 0.7982，全身刚体位置误差 5.44 cm）。",
       url: "https://github.com/yimingjiang216-alt/supermimic-g1-sim",
-      archify: "https://yimingjiang216-alt.github.io/supermimic-g1-sim/"
+      docExp: "sm_explainer.html",
+      docArch: "sm_arch.html"
     },
     {
       title: "2. mcp-3dgs · 基于 3D Gaussian Splatting 的具身空间智能服务",
@@ -1297,7 +1336,8 @@ function initOverlays() {
       gif: "https://raw.githubusercontent.com/yimingjiang216-alt/mcp-3dgs/main/figs/active_vln_orbit.gif",
       desc: "在 TUM fr1/desk 真实 RGB-D 室内场景上将三维高斯场封装为开放词汇 3D 定位、主动视角想象与 3σ 椭球膨胀 ESDF 避障规划工具；定位误差降至 4.1 cm（↓58%），最小避障安全裕度从 0.08m 提升至 0.18m（+125%）。",
       url: "https://github.com/yimingjiang216-alt/mcp-3dgs",
-      archify: "https://yimingjiang216-alt.github.io/mcp-3dgs/"
+      docExp: "mcp_explainer.html",
+      docArch: "mcp_arch.html"
     },
     {
       title: "3. vla-action-lab · VLA 动作块表征对照与 π0.5 闭环机械臂控制",
@@ -1305,7 +1345,8 @@ function initOverlays() {
       gif: "https://raw.githubusercontent.com/yimingjiang216-alt/vla-action-lab/main/figures/pi05_libero_spatial_0.gif",
       desc: "在真实 TUM 位姿与 7-DoF 操作轨迹上对比 Uniform Bins、多级 RVQ、FAST-DCT 频域分词与 Flow Matching + 4阶残差动作精炼（消除二值夹爪 0.386 吉布斯振铃，急动度 ↓35.3%），并在单卡 T4 上跑通开源 π0.5 的 LIBERO 闭环操作。",
       url: "https://github.com/yimingjiang216-alt/vla-action-lab",
-      archify: "https://yimingjiang216-alt.github.io/vla-action-lab/"
+      docExp: "vla_explainer.html",
+      docArch: "vla_arch.html"
     },
     {
       title: "4. rgbd-slam · 从零手写 RGB-D 视觉 SLAM 与几何基线门控回环",
@@ -1313,7 +1354,8 @@ function initOverlays() {
       gif: "https://raw.githubusercontent.com/yimingjiang216-alt/mcp-3dgs/main/figs/multimodal_3dgs_render.png",
       desc: "不依赖 g2o/Ceres 从零实现 RGB-D 里程计、局部 BA 与回环优化（TUM fr1/xyz ATE 4.49 cm）；定位短距离重访（基线中位数 11.89 cm）引发的回环旋转退化，设计 ≥0.30 m 基线门控在 fr1/room 上将全局误差降低 10.4%。",
       url: "https://github.com/yimingjiang216-alt/rgbd-slam",
-      archify: "https://yimingjiang216-alt.github.io/embodied-kb/archify.html"
+      docExp: "archify.html",
+      docArch: "architecture.html"
     }
   ];
   document.getElementById("portfolio-grid").innerHTML = PROJECTS.map(p => `
@@ -1325,9 +1367,10 @@ function initOverlays() {
           <h3 style="color:#f8fafc;font-size:15px;margin:4px 0 6px;">${escapeHtml(p.title)}</h3>
           <p style="font-size:12.5px;color:#cbd5e1;margin-bottom:12px;">${escapeHtml(p.desc)}</p>
         </div>
-        <div style="display:flex;gap:8px;">
-          <a class="ctrl-btn active" style="flex:1;text-align:center;text-decoration:none;padding:7px;" href="${p.archify}" target="_blank">✦ Archify 交互图解</a>
-          <a class="ctrl-btn" style="flex:1;text-align:center;text-decoration:none;padding:7px;" href="${p.url}" target="_blank">GitHub 仓库 →</a>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="ctrl-btn active" style="flex:1;padding:7px;" onclick="openEmbeddedArchify('${p.docExp}')">✦ 页内看一页图解</button>
+          <button class="ctrl-btn" style="flex:1;padding:7px;" onclick="openEmbeddedArchify('${p.docArch}')">❖ 页内看架构图</button>
+          <a class="ctrl-btn" style="flex:1;text-align:center;text-decoration:none;padding:7px;" href="${p.url}" target="_blank">GitHub ↗</a>
         </div>
       </div>
     </div>
