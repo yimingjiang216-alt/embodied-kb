@@ -3,12 +3,8 @@
 **帮你理清具身智能的学习路线：VLA 与世界模型，到底是怎么一回事、谁和谁什么关系。**
 36 份精读笔记 + 一张路线总图 + 认知三层架构，做成 RAG 知识库并用 MCP 封装——任何 MCP 客户端（Claude Code / Cursor / Codex / 自建 harness）连上就能问。
 
-> 🌐 **在线交互演示（无需安装，浏览器秒开）**：
-> - **交互式谱系画布与实时 BM25 检索站**：[**https://yimingjiang216-alt.github.io/embodied-kb/**](https://yimingjiang216-alt.github.io/embodied-kb/)
-> - **Archify 一页式架构拆解页 (Explainer)**：[**https://yimingjiang216-alt.github.io/embodied-kb/archify.html**](https://yimingjiang216-alt.github.io/embodied-kb/archify.html)
-> - **Archify 交互式全栈架构图 (Architecture Viewer)**：[**https://yimingjiang216-alt.github.io/embodied-kb/architecture.html**](https://yimingjiang216-alt.github.io/embodied-kb/architecture.html)
->
-> 支持：① **36 篇论文交互式三层认知架构与 6 档光谱点击查阅**；② **浏览器内置实时 BM25 检索与 15 题基准在线评测**；③ **任意两篇论文并排正面对比器**；④ **实操开源项目可视化展厅与 Archify 交互式架构导览**。
+> 🌐 **在线交互演示（无需安装，浏览器秒开）**：[**https://yimingjiang216-alt.github.io/embodied-kb/**](https://yimingjiang216-alt.github.io/embodied-kb/)
+> 支持：① **36 篇论文拓扑谱系画布与 Archify 演进全景图**；② **浏览器内置实时 BM25 检索与 15 题基准在线评测**；③ **任意两篇论文并排正面对比器**。
 
 > **核心是内容，不是代码。** 36 份笔记和那张谱系图**直接在网页或 GitHub 上读就行**，不需要 clone、不需要装任何东西。检索工具（BM25 + 可选语义）是给想深挖的人用的附加层——装不装都行，装了更好用。
 
