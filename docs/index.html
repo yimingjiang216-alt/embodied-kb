@@ -605,6 +605,8 @@
     </div>
 
     <div class="hud-box" style="gap:8px;">
+      <a class="ctrl-btn" style="text-decoration:none;color:#38bdf8;font-weight:700;" href="archify.html" target="_blank">✦ Archify 一页式图解</a>
+      <a class="ctrl-btn" style="text-decoration:none;color:#10b981;font-weight:700;" href="architecture.html" target="_blank">❖ Archify 架构全图</a>
       <button class="ctrl-btn" onclick="resetCanvasView()">⌖ 自适应居中</button>
       <button class="ctrl-btn" onclick="zoomCanvas(1.15)">＋ 放大</button>
       <button class="ctrl-btn" onclick="zoomCanvas(0.87)">－ 缩小</button>
@@ -1285,29 +1287,33 @@ function initOverlays() {
       title: "1. supermimic-g1-sim · Unitree G1 全身控制与可微物理世界模型",
       badge: "小脑全身控制 · MuJoCo 200Hz 闭环",
       gif: "https://raw.githubusercontent.com/yimingjiang216-alt/supermimic-g1-sim/main/figs/g1_showcase_6skills.gif",
-      desc: "复现 CoRL 2026 Oral SuperMimic：纯 PyTorch 29-DoF Unitree G1 可微正运动学 + 朝向归一化半隐式速度积分世界模型（16步误差 ↓32.7%）+ 24 步想象 BPTT。单卡 T4 14.5 分钟实现 6 类高动态技能 6/6 零失败闭环（回报 0.7982，刚体误差 5.44 cm）。",
-      url: "https://github.com/yimingjiang216-alt/supermimic-g1-sim"
+      desc: "复现 CoRL 2026 Oral SuperMimic：纯 PyTorch 29-DoF Unitree G1 解析正运动学辅助头 + 航向角规范化可微世界模型 + H=8 步路径导数反传。单卡 T4 实现 6 类高动态技能 0/6 跌倒闭环（归一化回报 0.7982，全身刚体位置误差 5.44 cm）。",
+      url: "https://github.com/yimingjiang216-alt/supermimic-g1-sim",
+      archify: "https://yimingjiang216-alt.github.io/supermimic-g1-sim/"
     },
     {
       title: "2. mcp-3dgs · 基于 3D Gaussian Splatting 的具身空间智能服务",
-      badge: "大脑空间记忆 · FastMCP 7 工具",
+      badge: "大脑空间记忆 · FastMCP 空间工具链",
       gif: "https://raw.githubusercontent.com/yimingjiang216-alt/mcp-3dgs/main/figs/active_vln_orbit.gif",
-      desc: "在 TUM fr1/desk 真实 RGB-D 场景上构建 4.5 万个各向异性三维语义高斯与 21 个物体实例：排查修复深度流 0.58s 启动滞后鬼影（深度 RMSE 降至 7.39 cm，↓55.2%），实现 100% 开放词汇 3D 定位、候选视角想象（无遮挡率 67.9%→99.7%）与 ESDF 三维避障。",
-      url: "https://github.com/yimingjiang216-alt/mcp-3dgs"
+      desc: "在 TUM fr1/desk 真实 RGB-D 室内场景上将三维高斯场封装为开放词汇 3D 定位、主动视角想象与 3σ 椭球膨胀 ESDF 避障规划工具；定位误差降至 4.1 cm（↓58%），最小避障安全裕度从 0.08m 提升至 0.18m（+125%）。",
+      url: "https://github.com/yimingjiang216-alt/mcp-3dgs",
+      archify: "https://yimingjiang216-alt.github.io/mcp-3dgs/"
     },
     {
-      title: "3. pi05-libero-sim & mini-vla-pi0 · π0/π0.5 架构部署与鲁棒性评测",
-      badge: "运动皮层 VLA · 270 次受控推理",
-      gif: "https://raw.githubusercontent.com/yimingjiang216-alt/supermimic-g1-sim/main/figs/g1_comparison_3methods.gif",
-      desc: "构建 238 万参数轻量化 π0（左右转指令切换动作严格反向 gap 0.995），并在单卡 T4 完成 3B 开源 π0.5 的 LIBERO 机械臂闭环部署；通过 270 次受控推理定量分离随机种子波动（5.11% 等效解）与口语化指令改写劣化（10.55%，偏差扩大 1.83×）。",
-      url: "https://github.com/yimingjiang216-alt/pi05-libero-sim"
+      title: "3. vla-action-lab · VLA 动作块表征对照与 π0.5 闭环机械臂控制",
+      badge: "运动皮层 VLA · 分词基准 + LIBERO 闭环",
+      gif: "https://raw.githubusercontent.com/yimingjiang216-alt/vla-action-lab/main/figures/pi05_libero_spatial_0.gif",
+      desc: "在真实 TUM 位姿与 7-DoF 操作轨迹上对比 Uniform Bins、多级 RVQ、FAST-DCT 频域分词与 Flow Matching + 4阶残差动作精炼（消除二值夹爪 0.386 吉布斯振铃，急动度 ↓35.3%），并在单卡 T4 上跑通开源 π0.5 的 LIBERO 闭环操作。",
+      url: "https://github.com/yimingjiang216-alt/vla-action-lab",
+      archify: "https://yimingjiang216-alt.github.io/vla-action-lab/"
     },
     {
-      title: "4. rgbd-slam & sfm-3dgs-pipeline · 多模态 SLAM 与 3DGS 重建管线",
-      badge: "三维几何底座 · 稀疏 BA 与回环门控",
+      title: "4. rgbd-slam · 从零手写 RGB-D 视觉 SLAM 与几何基线门控回环",
+      badge: "三维几何底座 · 手写 ICP + 局部 BA + SE(3) 位姿图",
       gif: "https://raw.githubusercontent.com/yimingjiang216-alt/mcp-3dgs/main/figs/multimodal_3dgs_render.png",
-      desc: "实现视觉/激光 SLAM（TUM fr1/xyz 视觉 ATE 4.49 cm，fr1/desk 激光 ATE 9.66 cm），定位短距离重访（基线中位数仅 11.89 cm）引发的回环旋转退化（12.57°），设计 ≥0.30 m 基线门控与 Top-10 内点筛选在 fr1/room 上将全局误差降低 10.4%。",
-      url: "https://github.com/yimingjiang216-alt/rgbd-slam"
+      desc: "不依赖 g2o/Ceres 从零实现 RGB-D 里程计、局部 BA 与回环优化（TUM fr1/xyz ATE 4.49 cm）；定位短距离重访（基线中位数 11.89 cm）引发的回环旋转退化，设计 ≥0.30 m 基线门控在 fr1/room 上将全局误差降低 10.4%。",
+      url: "https://github.com/yimingjiang216-alt/rgbd-slam",
+      archify: "https://yimingjiang216-alt.github.io/embodied-kb/archify.html"
     }
   ];
   document.getElementById("portfolio-grid").innerHTML = PROJECTS.map(p => `
@@ -1319,7 +1325,10 @@ function initOverlays() {
           <h3 style="color:#f8fafc;font-size:15px;margin:4px 0 6px;">${escapeHtml(p.title)}</h3>
           <p style="font-size:12.5px;color:#cbd5e1;margin-bottom:12px;">${escapeHtml(p.desc)}</p>
         </div>
-        <a class="ctrl-btn active" style="text-align:center;text-decoration:none;padding:7px;" href="${p.url}" target="_blank">查看 GitHub 仓库与实验报告 →</a>
+        <div style="display:flex;gap:8px;">
+          <a class="ctrl-btn active" style="flex:1;text-align:center;text-decoration:none;padding:7px;" href="${p.archify}" target="_blank">✦ Archify 交互图解</a>
+          <a class="ctrl-btn" style="flex:1;text-align:center;text-decoration:none;padding:7px;" href="${p.url}" target="_blank">GitHub 仓库 →</a>
+        </div>
       </div>
     </div>
   `).join("");
